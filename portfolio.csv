@@ -1,0 +1,2 @@
+,timestamp,orderID,symbol,price,side,ordType,orderQty
+0,2020-08-24T21:14:26.368Z,d63074c4-85e9-901b-f964-e2bcf3e33ea8,XBTUSD,11739.5,Buy,Market,1

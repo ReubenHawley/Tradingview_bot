@@ -18,21 +18,27 @@ if __name__ == '__main__':
             parameters = read_emails.email_scanner()
             if parameters is not None:
                 if mex.available_balance() > 0:  # TODO see if requested trade size !> than available balance
-                    order = mex.executeTrade(symbol=parameters[0], direction=parameters[2], size=parameters[3])
+                    order = mex.executeTrade(parameters[0], parameters[1],
+                                             parameters[2], parameters[3])
                     print(order)
                     if "error" not in order:
+                        read_emails.imap.delete_message(read_emails.CountEmails())
                         order_dict = order.pop('info')
                         order_details = [order_dict['timestamp'], order_dict['orderID'],
-                                         order_dict['symbol'], order_dict['side'],
+                                         order_dict['symbol'], order_dict['price'], order_dict['side'],
                                          order_dict['ordType'], order_dict['orderQty']]
-                        trade_history.ADD_TRADE(
-                            order_details)  # adds the necessary details from the order to the portfolio
+                        trade_history.ADD_TRADE(order_details)  # adds the order to the portfolio
                         trade_history.CREATE_CSV()
-                        read_emails.imap.delete_message(read_emails.CountEmails())
+                        sell_price = order_details[3]*1.025
+                        exit_order = mex.executeTrade(parameters[0], 'LIMIT', 'SELL', sell_price)
+                        trade_history.ADD_TRADE(exit_order)  # adds the order to the portfolio
+                        print(exit_order)
+
                         read_emails.Send_report(order)
                         parameters = None
                         time.sleep(5)
                     else:
+                        print('error encountered, retrying')
                         continue
             else:
                 time.sleep(5)
