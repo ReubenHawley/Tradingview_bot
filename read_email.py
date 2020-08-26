@@ -24,9 +24,12 @@ class EmailScanner:
             self.imap.login()
             self.FetchEmails()
             self.message_total = None
+
         except FileNotFoundError:
             print("no config file found, please create one or make sure its in the working directory... \nexiting")
             sys.exit(0)
+        except Exception as e:
+            print(f'error instantiating email: {e}')
 
     def FetchEmails(self):
         try:
@@ -39,7 +42,7 @@ class EmailScanner:
             print("Failed to connect. retrying...")
             self.FetchEmails()
         except Exception as e:
-            print(f'Encountered error {e}')
+            print(f'Encountered error fetching emails {e}')
             self.Send_report(e, f'{e.args}')
 
     def CountEmails(self):
@@ -52,7 +55,7 @@ class EmailScanner:
         except IndexError:
             print("no valid trade execution parameters")
         except Exception as e:
-            print(f'Encountered error {e}')
+            print(f'Encountered error retrieving email count {e}')
             self.Send_report(e, f'{e.args}')
 
     def email_scanner(self):
@@ -74,42 +77,42 @@ class EmailScanner:
         except IndexError:
             print("no valid trade execution parameters")
         except Exception as e:
-            print(f'Encountered error {e}')
+            print(f'Encountered error in email_scanner {e}')
             self.Send_report(e, f'{e.args}')
 
     def LogOut(self):
         self.imap.logout()
 
     @staticmethod
-    def Send_report(data, subject="Trade executed",):
-        """ data to be sent here should include trade execution details
-        and should be passed directly from the order return"""
-        # contacts = ["algotrader161@gmail.com"] #  used in case of a mailing list
-        msg = EmailMessage()
-        msg['Subject'] = subject
-        msg["From"] = 'algotrader161@gmail.com'
-        msg["To"] = 'algotrader161@gmail.com'
-        if isinstance(data, dict):  # this checks if we have trade parameters to access
-            if "error" in data:
-                data.pop("error")
-                msg['Subject'] = data['name']
-                msg.set_content(f'Tried to execute trade but failed with the following message:\n'
-                                f'{data["message"]}')
-            else:
-                data.pop("info")
-                msg.set_content(f'{subject} with the following details:\n'
-                                f'Symbol: {data["symbol"]}\n'
-                                f'Direction: {data["side"]}\n'
-                                f'Order type: {data["ordType"]}\n'
-                                f'Size: {data["orderQty"]}'
-                                f'executed at {data["price"]} ')
-        else:
-            msg.set_content(f'An activity has taken place with the following details:\n{data}')
-
+    def Send_report(data, subject="Trade executed"):
         try:
+            """ data to be sent here should include trade execution details
+            and should be passed directly from the order return"""
+            # contacts = ["algotrader161@gmail.com"] #  used in case of a mailing list
+            msg = EmailMessage()
+            msg['Subject'] = subject
+            msg["From"] = 'algotrader161@gmail.com'
+            msg["To"] = 'algotrader161@gmail.com'
+            if isinstance(data, dict):  # this checks if we have trade parameters to access
+                if "error" in data:
+                    data.pop("error")
+                    msg['Subject'] = data['name']
+                    msg.set_content(f'Tried to execute trade but failed with the following message:\n'
+                                    f'{data["message"]}')
+                else:
+                    #data.pop("info")
+                    msg.set_content(f'{subject} with the following details:\n'
+                                    f'Symbol: {data["symbol"]}\n'
+                                    f'Direction: {data["side"]}\n'
+                                    f'Order type: {data["ordType"]}\n'
+                                    f'Size: {data["orderQty"]}'
+                                    f'executed at {data["price"]} ')
+            else:
+                msg.set_content(f'An activity has taken place with the following details:\n{data}')
+
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login('algotrader161@gmail.com', 'Computers161')
 
                 smtp.send_message(msg=msg)
         except Exception as e:
-            print(f'Encountered error {e}')
+            print(f'Encountered error sending report {e}')
