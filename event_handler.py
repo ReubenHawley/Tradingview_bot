@@ -44,6 +44,7 @@ if __name__ == '__main__':
                         trade_history.ADD_TRADE(order_details)  # adds the order to the portfolio
                         trade_history.CREATE_CSV()
                         sell_price = order_details[3]*1.025
+                        sellQTY = float(order_dict['orderQty'])*1.025
                         # exit_order = mex.executeTrade(parameters[0], 'LIMIT', 'SELL',parameters[3], sell_price)
                         exit_order = {
                             'timestamp': round(time()),
@@ -52,7 +53,7 @@ if __name__ == '__main__':
                             'price': sell_price,
                             'side': 'sell',
                             'ordType': 'limit',
-                            'orderQty': parameters[3]
+                            'orderQty': sellQTY
                         }
                         trade_history.ADD_TRADE(exit_order)  # adds the order to the portfolio
                         trade_history.CREATE_CSV()
