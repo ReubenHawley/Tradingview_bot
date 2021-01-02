@@ -1,5 +1,5 @@
 import os
-
+from event_handler import Run_bot
 if __name__ == '__main__':
     print('                         WELCOME TO AUTOBOT\n'
           '\n------------------------------------------------------------------------------\n'
@@ -231,3 +231,8 @@ if __name__ == '__main__':
         outF.write("\n")
     outF.close()
     os.system('pip install -r requirements.txt')
+    startup = input('Would you like to run the bot now? ')
+    if startup == 'yes' or 'y' or 'Yes':
+        Run_bot()
+    else:
+        exit()

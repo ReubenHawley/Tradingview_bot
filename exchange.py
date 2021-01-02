@@ -1,6 +1,8 @@
 import ccxt
 import os
-
+import pandas as pd
+import time
+from ccxt.base.decimal_to_precision import ROUND_UP
 
 class Exchange:
     def __init__(self):
@@ -15,17 +17,53 @@ class Exchange:
         except Exception as e:
             print(f'error instantiating exchange: {e}')
 
-    def Fetch_markets(self):
+    def Fetch_OHLCV(self, ticker='BTC/USDT', timeframe='1d',number_of_candles=100):
+        msec = 1000
+        minute = 60 * msec
+        hold = 30
+
+        # -----------------------------------------------------------------------------
+
+        exchange = ccxt.binance({
+            'rateLimit': 1000,
+            'enableRateLimit': True,
+            # 'verbose': True,
+        })
+
+        limit = number_of_candles
+        timeframe = timeframe
+        interval = exchange.parse_timeframe(timeframe) * 1000
+        pair = ticker
+        cols = ['Timestamp', 'open', 'high', 'low', 'close', 'volume']
         try:
-            markets = self.binance.fetch_markets()
-            return markets
+
+            print(exchange.milliseconds(), 'Fetching candles')
+            since = exchange.round_timeframe(timeframe, exchange.milliseconds(), ROUND_UP) - (limit * interval)
+            ohlcv = exchange.fetch_ohlcv(pair, timeframe, since=since, limit=limit)
+            df = pd.DataFrame(ohlcv, columns=cols)
+            return df
+        except (
+        ccxt.ExchangeError, ccxt.AuthenticationError, ccxt.ExchangeNotAvailable, ccxt.RequestTimeout) as error:
+
+            print('Got an error', type(error).__name__, error.args, ', retrying in', hold, 'seconds...')
+            time.sleep(hold)
+
+    def Fetch_ticker(self,ticker):
+        try:
+            return_ticker = self.binance.fetch_ticker(ticker)
+            return return_ticker
         except Exception as e:
             print(f'error in trying to fetch markets: {e}')
 
-    def available_balance(self):
+    def volatility(self,ticker):
+        trading_pair = self.Fetch_ticker(ticker)
+        volatility = 100 - abs((trading_pair['high']/trading_pair['close']) - (trading_pair['low']/trading_pair['close'])*100)
+        return float(volatility)
+
+    def available_balance(self, pair='USDT'):
         try:
             account = self.binance.fetchBalance(params={})['free']
-            available_balance = (account['BTC'])
+            available_balance = (account[pair])
             return available_balance
         except Exception as e:
             print(f'error in fetching balance: {e}')

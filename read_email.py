@@ -18,7 +18,7 @@ class EmailScanner:
         try:
             self.c_dir = os.path.dirname(__file__)
             with open(os.path.join(self.c_dir, "config.txt")) as key_file:
-                _, _, self.username, _ = key_file.read().splitlines()
+                _, _, self.username, self.P = key_file.read().splitlines()
             self.imap = ImapClient(recipient=self.username)
             self.messages = None
             self.imap.login()
@@ -83,8 +83,8 @@ class EmailScanner:
     def LogOut(self):
         self.imap.logout()
 
-    @staticmethod
-    def Send_report(data, subject="Trade executed"):
+
+    def Send_report(self,data, subject="Trade executed"):
         try:
             """ data to be sent here should include trade execution details
             and should be passed directly from the order return"""
@@ -111,7 +111,7 @@ class EmailScanner:
                 msg.set_content(f'An activity has taken place with the following details:\n{data}')
 
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                smtp.login('algotrader161@gmail.com', 'Computers161')
+                smtp.login('algotrader161@gmail.com', self.P)
 
                 smtp.send_message(msg=msg)
         except Exception as e:
