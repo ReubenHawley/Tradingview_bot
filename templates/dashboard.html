@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+    .topnav {
+  overflow: hidden;
+  background-color: black;
+}
+
+/* Navbar links */
+.topnav a {
+  float: left;
+  display: block;
+  background:black;
+  color: #ffcc00;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Links - change color on hover */
+.topnav a:hover {
+  background-color: black;
+  color: #fff0b3;
+}
+    body{background:black;
+         font-family: arial;
+         text-align: center;
+         color: white}
+
+    trades{margin: auto;
+           text-align:center;}
+
+    table{background: #ffcc00;
+          color:black;
+          border-radius:25px;
+          margin:auto;}
+
+    td{padding:15px}
+    .header{
+        text-align: center;
+        padding: 20px;}
+
+    /* Create three equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 30%;
+  padding: 15px;
+  background:#ffcc00;
+  border-radius:25px;
+  color:black;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+@media screen and (max-width: 600px) {
+  .column {
+    height:66px;
+    width: 306px;
+  }
+}
+    tr:nth-child(even) {background: #ffcc00}
+    tr:nth-child(odd) {background: #fff0b3}
+    .center {
+        margin: auto;
+        width: 50%;
+        border: 3px solid black;
+        padding: 10px;}
+    th{border-radius:25px;
+    }
+    h2{color:#ffcc00}
+
+    </style>
+    <meta charset="UTF-8">
+    <title>Executed trades</title>
+</head>
+<body>
+<div class="topnav">
+  <a href="#">Trade</a>
+  <a href="#">Account</a>
+  <a href="#">performance</a>
+</div>
+    <div class="center">
+        <img class='header' src="https://bin.bnbstatic.com/static/images/common/nav-logo.svg">
+    </div>
+    <div class="row">
+        <div class="column">BTC: {{btc_holdings}}</div>
+        <div class="column">USDT: {{usdt_balance}}</div>
+        <div class="column">ACCOUNT TOTAL IN USDT: {{total_usdt_value}}</div>
+    </div>
+        <div class="trades">
+            <h2> Executed trades</h2>
+            <table>
+                <tr>
+                    <th>TIMESTAMP</th>
+                    <th>DATETIME</th>
+                    <th>ID</th>
+                    <th>SYMBOL</th>
+                    <th>SIDE</th>
+                    <th>PRICE</th>
+                    <th>AMOUNT</th>
+                    <th>VALUE</th>
+
+                </tr>
+                {% for trade in trades %}
+                    <tr>
+                        <td>{{trade.timestamp}}</td>
+                        <td>{{trade.datetime}}</td>
+                        <td>{{trade.id}}</td>
+                        <td>{{trade.symbol}}</td>
+                        <td>{{trade.side}}</td>
+                        <td>{{trade.price}}</td>
+                        <td>{{trade.amount}}</td>
+                        <td>${{trade.cost}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+
+</body>
+</html>

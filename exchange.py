@@ -4,6 +4,7 @@ import pandas as pd
 import time
 from ccxt.base.decimal_to_precision import ROUND_UP
 
+
 class Exchange:
     def __init__(self):
         try:

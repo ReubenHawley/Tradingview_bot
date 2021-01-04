@@ -1,10 +1,8 @@
 import pandas as pd
-from read_email import EmailScanner
 
 
 class Portfolio:
     def __init__(self):
-        self.email = EmailScanner()
         self.columns = ['timestamp', 'orderID', 'symbol', 'price', 'side', 'ordType', 'orderQty']
         self.trade_history = pd.DataFrame(columns=self.columns)
 
@@ -16,7 +14,6 @@ class Portfolio:
             print('mismatch in value count being added to the list')
         except Exception as e:
             print(f'error adding trade: {e}')
-            self.email.Send_report(e.args, e)
 
     def CREATE_CSV(self):
         try:
