@@ -1,0 +1,10 @@
+{
+    "strategy": {
+        "quantity": 0.001,
+        "side": "BUY",
+        "symbol": "BTC/USDT",
+        "ordertype": "MARKET",
+
+
+
+}
