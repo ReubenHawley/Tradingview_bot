@@ -83,7 +83,7 @@ def webhook():
                                         order_type='LIMIT',
                                         side=side,
                                         quantity=quantity,
-                                        price=None)  # TODO change None to limit price
+                                        price=close*1.025)  # TODO change None to limit price
             print(f'Take profit submitted: {exit_order_response}')
         # construct trade details
         trades = binance.fetch_my_trades('BTC/USDT')
