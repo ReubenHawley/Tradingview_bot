@@ -73,7 +73,7 @@ def webhook():
         print(f'entry trade submitted: {entry_order_response}')
 
         if entry_order_response:
-            limit_price = round(float(close * 1.025), 2)
+            limit_price = round(float(close * 1.003), 2)
             sell = "SELL"
             exit_order_response = order(ticker=symbol,
                                         trade_type='LIMIT',
@@ -82,6 +82,8 @@ def webhook():
                                         price=limit_price)  # TODO change None to limit price"""
             if exit_order_response:
                 print(f'Take profit submitted: {exit_order_response}')
-    else:
-        webhook_message = None
     return webhook_message
+
+if __name__ == '__main__':
+    app.debug = True
+    app.run()
