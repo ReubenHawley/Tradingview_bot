@@ -1,11 +1,14 @@
+#!/usr/bin/python3
 from flask import Flask, request, render_template
 import ccxt
 import os
 from ast import literal_eval
 from flask_ngrok import run_with_ngrok
 
+
 # Start ngrok when app is run
 try:
+
     c_dir = os.path.dirname(__file__)
     with open(os.path.join(c_dir, "config.txt")) as key_file:
         api_key, secret, _, _ = key_file.read().splitlines()
@@ -17,6 +20,7 @@ try:
     btc_holdings = binance.fetch_free_balance()['BTC']
     usdt_value_btc_holdings = btc_holdings * binance.fetch_ticker('BTC/USDT')['close']
     total_usdt_value = available_balance + usdt_value_btc_holdings
+
 
 except Exception as e:
     print(f'error instantiating exchange: {e}')
@@ -68,20 +72,21 @@ def webhook():
         entry_order_response = order(ticker=symbol,
                                      trade_type=order_type,
                                      direction=side,
-                                     amount=quantity,
+                                     amount=0.001,
                                      price=None)
-        print(f'entry trade submitted: {entry_order_response}')
+        print(f'entry trade submitted: {entry_order_response.pop("info")}')
+
 
         if entry_order_response:
-            limit_price = round(float(close * 1.003), 2)
+            limit_price = ((entry_order_response['price']*1.001)*1.003)
             sell = "SELL"
             exit_order_response = order(ticker=symbol,
                                         trade_type='LIMIT',
                                         direction=sell,
-                                        amount=quantity,
+                                        amount=0.001,
                                         price=limit_price)  # TODO change None to limit price"""
             if exit_order_response:
-                print(f'Take profit submitted: {exit_order_response}')
+                print(f'Take profit submitted: {exit_order_response.pop("info")}')
     return webhook_message
 
 if __name__ == '__main__':
