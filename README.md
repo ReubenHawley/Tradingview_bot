@@ -1,6 +1,6 @@
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
+*** that would make this better, please fork the Tradingview_bot and create a pull request
 *** or simply open an issue with the tag "enhancement".
 *** Thanks again! Now go create something AMAZING! :D
 ***
@@ -122,7 +122,7 @@ This is an example of how to list things you need to use the software and how to
 
 1. Sign in to exchange of choice or sign up using my [Binance](https://www.binance.com/en/register?ref=FGEE7YGZ) referral to get 10% off fees
 2. Create an `API KEY` on your exchange and write down the `API KEY` and the `API SECRET`
-3. Clone the repo
+3. Clone the Tradingview_bot
    ```sh
    git clone https://github.com/ReubenHawley/Tradingview_bot.git
    ```
@@ -217,15 +217,15 @@ Igor Kroitor](https://github.com/kroitor) - examples on API usage CCXT
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/ReubenHawley/repo.svg?style=for-the-badge
-[contributors-url]: https://github.com/ReubenHawley/repo/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/ReubenHawley/repo.svg?style=for-the-badge
-[forks-url]: https://github.com/ReubenHawley/repo/network/members
-[stars-shield]: https://img.shields.io/github/stars/ReubenHawley/repo.svg?style=for-the-badge
-[stars-url]: https://github.com/ReubenHawley/repo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/ReubenHawley/repo.svg?style=for-the-badge
-[issues-url]: https://github.com/ReubenHawley/repo/issues
-[license-shield]: https://img.shields.io/github/license/ReubenHawley/repo.svg?style=for-the-badge
-[license-url]: https://github.com/ReubenHawley/repo/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/ReubenHawley/Tradingview_bot.svg?style=for-the-badge
+[contributors-url]: https://github.com/ReubenHawley/Tradingview_bot/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/ReubenHawley/Tradingview_bot.svg?style=for-the-badge
+[forks-url]: https://github.com/ReubenHawley/Tradingview_bot/network/members
+[stars-shield]: https://img.shields.io/github/stars/ReubenHawley/Tradingview_bot.svg?style=for-the-badge
+[stars-url]: https://github.com/ReubenHawley/Tradingview_bot/stargazers
+[issues-shield]: https://img.shields.io/github/issues/ReubenHawley/Tradingview_bot.svg?style=for-the-badge
+[issues-url]: https://github.com/ReubenHawley/Tradingview_bot/issues
+[license-shield]: https://img.shields.io/github/license/ReubenHawley/Tradingview_bot.svg?style=for-the-badge
+[license-url]: https://github.com/ReubenHawley/Tradingview_bot/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/reuben-hawley-976520109/
