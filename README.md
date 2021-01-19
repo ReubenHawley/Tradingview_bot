@@ -32,7 +32,7 @@ __Setup requirements:__
 - stable internet connection / cloud deployment server
 ---
 
-__Setup:__
+__Getting started:__
 1. execute the setup.py file
 2.enter your API_KEY for the exchange you want to trade on
 3. enter your API_SECRET for the exchange you want to trade on
