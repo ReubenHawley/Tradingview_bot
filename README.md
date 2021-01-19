@@ -2,11 +2,11 @@
 > Automate trading using the alerts webhook on tradingview. 
 ---
 __Description__
->Autobot scans a relevant labeled inbox for alerts from tradingview
->these alerts are then checked for any trade execution paramters (AAA + ZZZ)
->after successfully executing the trade, you will receive a notification email with the trade details
->should a trade be unsuccessful, it will reattempt to submit it again
->after execution the alert email is deleted
+> Captures alerts on the webhook
+> These alerts are then parsed and checked for any trade execution paramters 
+> After successfully executing the trade, it will immediately place a counter trade
+> should a trade be unsuccessful, it will reattempt to submit it again
+
 ------------------------------------------------------------------------------------------------------------------------
 __DISCLAIMER:__
 
@@ -20,12 +20,14 @@ __Dependencies:__
 |----------|-------|
 |ccxt|execution of exchange API|
 |Flask|webhook listener|
+|flask_ngrok|tunneling flask through NGROK|
 |NGROK|HTTP tunneling|
 
 __Setup requirements:__
 - python 3.4 or later
 - ccxt
 - flask
+- NGROK
 - tradingview account(preferably premium) as trade execution orders are placed using alerts
 - stable internet connection / cloud deployment server
 ---
@@ -35,6 +37,7 @@ __Setup:__
 2.enter your API_KEY for the exchange you want to trade on
 3. enter your API_SECRET for the exchange you want to trade on
 4. setup will then install all necessary packages
+5. create NGROK account on [NGROK](https://ngrok.com/)
 ------------------------------------------------------------------------------------------------------------------------
 __Executing the bot:__
 > 1. On the commandline/shell `./ngrok http 5000` for a linux or mac, if using windows `reconsider life choices`
