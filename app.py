@@ -81,12 +81,10 @@ def webhook():
         order_type = webhook_message['ordertype']
         side = webhook_message['side']
         symbol = f'{quote}/{base}'
-        close = binance.fetch_ticker(symbol)['close']
-        position_size = float(close*quantity)
         price = webhook_message['price']
         "do a check to see if the trade is possible"
         if side == "BUY":
-            if position_size < binance.fetch_free_balance()[base]:
+            if float(webhook_message['quantity'])*binance.fetch_ticker(symbol)['close'] < binance.fetch_free_balance()[base]:
                 "returns the response from the exchange, whether successful or not"
                 entry_order_response = order(ticker=symbol,
                                              trade_type=order_type,

@@ -40,8 +40,8 @@ class EmailScanner:
                     msg.set_content(f'{subject} with the following details:\n'
                                     f'Symbol: {data["symbol"]}\n'
                                     f'Direction: {data["side"]}\n'
-                                    f'Order type: {data["ordType"]}\n'
-                                    f'Size: {data["orderQty"]}'
+                                    f'Order type: {data["type"]}\n'
+                                    f'Size: {data["amount"]}'
                                     f'executed at {data["price"]} ')
             else:
                 msg.set_content(f'An activity has taken place with the following details:\n{data}')
@@ -51,4 +51,4 @@ class EmailScanner:
 
                 smtp.send_message(msg=msg)
         except Exception as e:
-            print(f'Encountered error sending report {e.__name__} with the following arguments:{e.ergs}')
+            print(f'Encountered error sending report {e.__traceback__} with the following arguments:{e.args}')
