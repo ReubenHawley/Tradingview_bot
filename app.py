@@ -8,14 +8,15 @@ from flask_ngrok import run_with_ngrok
 
 # Start ngrok when app is run
 try:
-
+    " open the config file to retrieve the apikey and secret "
     c_dir = os.path.dirname(__file__)
     with open(os.path.join(c_dir, "config.txt")) as key_file:
         api_key, secret, _, _ = key_file.read().splitlines()
+    "Instantiate the exchange"
     binance = ccxt.binance()
     binance.apiKey = api_key
     binance.secret = secret
-    # binance.uid = 'hczj0167'
+
     available_balance = binance.fetch_free_balance()['USDT']
     btc_holdings = binance.fetch_free_balance()['BTC']
     usdt_value_btc_holdings = btc_holdings * binance.fetch_ticker('BTC/USDT')['close']
@@ -51,15 +52,16 @@ def Dashboard():
                            total_usdt_value=total_usdt_value,
                            )
 
+
 # webhook for receiving of orders
-
-
 @app.route('/webhook', methods=['POST'])
 def webhook():
+    " capture the webhook through a listener into a variable called webhook_message"
     webhook_message = request.data
+    " parse the text into json format"
     webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
 
-    # defining the order criteria
+    "pass the payload to relevant variables to be executed in the order function"
     quantity = webhook_message['quantity']
     order_type = webhook_message['ordertype']
     side = webhook_message['side']
@@ -68,18 +70,21 @@ def webhook():
     position_size = close*quantity
     price = webhook_message['price']
 
-    # do a check to see if the trade is possible
+    "do a check to see if the trade is possible"
     if position_size < available_balance:
+        "returns the response from the exchange, whether successful or not"
         entry_order_response = order(ticker=symbol,
                                      trade_type=order_type,
                                      direction=side,
                                      amount=quantity,
                                      price=price)
+        "prints response to the console"
         print(f'entry trade submitted: {entry_order_response}')
-
+    "flask requires a return value otherwise it throws an error"
     return webhook_message
 
 
 if __name__ == '__main__':
+    "instantiate the flask app in debug mode"
     app.debug = True
     app.run()
