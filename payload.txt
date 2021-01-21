@@ -1,10 +1,8 @@
 {
-    "strategy": {
-        "quantity": 0.001,
-        "side": "BUY",
-        "symbol": "BTC/USDT",
-        "ordertype": "MARKET",
-
-
-
+    "base": "USDT",
+    "quote": "BTC",
+    "quantity": "0.001",
+    "side": "BUY",
+    "ordertype": "LIMIT",
+    "price":"31552",
 }
