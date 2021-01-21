@@ -1,3 +1,7 @@
+import os
+commands = ["export FLASK_APP=app",
+            'export FLASK_APP=app',
+            'flask run']
 
 if __name__ == '__main__':
     print('                         WELCOME TO AUTOBOT\n'
@@ -192,7 +196,7 @@ if __name__ == '__main__':
           same "printed page" as the copyright notice for easier
           identification within third-party archives.
 
-       Copyright [yyyy] [name of copyright owner]
+       Copyright 2021 Reuben Hawley
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -216,8 +220,9 @@ if __name__ == '__main__':
 
     API_ID = input('please enter (1) trading account api id: ')
     API_KEY = input('please enter (2) trading account api secret key: ')
-
-    values = [API_ID, API_KEY]
+    email_address = input('please enter your email address')
+    email_password = input('please enter your email password ')
+    values = [API_ID, API_KEY, email_address, email_password]
 
     outF = open("config.txt", "w")
     for line in values:
@@ -225,5 +230,9 @@ if __name__ == '__main__':
         outF.write(line)
         outF.write("\n")
     outF.close()
-    startup = input('Would you like to run the bot now? ')
-    exit()
+    startup = input('Would you like to run the bot now? Y or N ')
+    if startup == 'y' or "Y":
+        for command in commands:
+            os.system(command)
+    else:
+        exit()
