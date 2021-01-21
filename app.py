@@ -95,7 +95,11 @@ def webhook():
                 print(f'entry trade submitted: {entry_order_response}')
                 "sends an email of the executed trade"
                 email.Send_report(entry_order_response)
-            "flask requires a return value otherwise it throws an error"
+            else:
+                insufficient_balance = "order not submitted, balance insufficient"
+                email.Send_report(insufficient_balance)
+                print(insufficient_balance)
+
         elif side == "SELL":
             if quantity < binance.fetch_free_balance()[quote]:
                 print(f"{symbol}-{order_type}-{side}-{quantity}-{price}")
@@ -110,6 +114,10 @@ def webhook():
                 "sends an email of the executed trade"
                 email.Send_report(entry_order_response)
             "flask requires a return value otherwise it throws an error"
+        else:
+            insufficient_balance = "order not submitted, balance insufficient"
+            email.Send_report(insufficient_balance)
+            print(insufficient_balance)
         return webhook_message
     except Exception as e:
         print('type is:', e.__class__.__name__)
