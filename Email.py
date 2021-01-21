@@ -18,6 +18,7 @@ class EmailScanner:
         except FileNotFoundError:
             print("no config file found, please create one or make sure its in the working directory... \nexiting")
             sys.exit(0)
+
         except ConnectionError:
             print(f'error instantiating email: could not connect to exchange')
 
@@ -36,6 +37,7 @@ class EmailScanner:
                     msg['Subject'] = data['name']
                     msg.set_content(f'Tried to execute trade but failed with the following message:\n'
                                     f'{data["message"]}')
+
                 elif "insufficient" in data:
                     msg.set_content(f'Tried to execute trade but failed with the following message:\n'
                                     f'{data}')
