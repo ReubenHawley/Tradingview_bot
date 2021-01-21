@@ -26,7 +26,7 @@ except Exception as e:
     print(f'error instantiating exchange: {e}')
 
 
-def order(ticker, trade_type, direction, amount, price):
+def order(ticker, trade_type, direction, amount, price=None):
     try:
         print(f'sending order: {ticker} - {trade_type} - {direction} - {amount} - {price}')
         order_receipt = binance.create_order(ticker, trade_type, direction, amount, price)
@@ -64,30 +64,21 @@ def webhook():
     order_type = webhook_message['ordertype']
     side = webhook_message['side']
     symbol = webhook_message['symbol']
-    close = binance.fetch_ticker('BTC/USDT')['close']
+    close = binance.fetch_ticker(symbol)['close']
     position_size = close*quantity
+    price = webhook_message['price']
 
     # do a check to see if the trade is possible
     if position_size < available_balance:
         entry_order_response = order(ticker=symbol,
                                      trade_type=order_type,
                                      direction=side,
-                                     amount=0.001,
-                                     price=None)
-        print(f'entry trade submitted: {entry_order_response.pop("info")}')
+                                     amount=quantity,
+                                     price=price)
+        print(f'entry trade submitted: {entry_order_response}')
 
-
-        if entry_order_response:
-            limit_price = ((entry_order_response['price']*1.001)*1.003)
-            sell = "SELL"
-            exit_order_response = order(ticker=symbol,
-                                        trade_type='LIMIT',
-                                        direction=sell,
-                                        amount=0.001,
-                                        price=limit_price)  # TODO change None to limit price"""
-            if exit_order_response:
-                print(f'Take profit submitted: {exit_order_response.pop("info")}')
     return webhook_message
+
 
 if __name__ == '__main__':
     app.debug = True
