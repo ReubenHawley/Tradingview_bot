@@ -22,7 +22,7 @@ class EmailScanner:
         except ConnectionError:
             print(f'error instantiating email: could not connect to exchange')
 
-    def Send_report(self,receiver, data, subject="Trade executed"):
+    def send_report(self, data, receiver=None, subject="Trade executed"):
         try:
             """ data to be sent here should include trade execution details
             and should be passed directly from the order return"""
