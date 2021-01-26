@@ -9,7 +9,8 @@ from Email  import EmailScanner
 
 # Start ngrok when app is run
 try:
-    " open the config file to retrieve the apikey and secret "
+    """ open the config file to retrieve the apikey and secret 
+    instantiate Reuben bot"""
     c_dir = os.path.dirname(__file__)
     with open(os.path.join(c_dir, "config.txt")) as key_file:
         api_key, secret, _, _ = key_file.read().splitlines()

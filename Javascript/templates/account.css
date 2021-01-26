@@ -1,0 +1,35 @@
+.coin-list {
+  align:right,
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+.piechart {
+        margin-top: 300px;
+        display: block;
+        align: center;
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background-image: conic-gradient(
+            pink 70deg,
+            lightblue 0 235deg,
+            orange 0);
+    }
+
+    body,
+    .piechart {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}

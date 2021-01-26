@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="account.css">
+    <meta charset="UTF-8">
+    <title>Executed trades</title>
+</head>
+<body>
+<div class="topnav">
+  <a href="#">Trade</a>
+  <a href="#">Account</a>
+  <a href="#">performance</a>
+</div>
+    <div class="center">
+        <img class='header' src="https://bin.bnbstatic.com/static/images/common/nav-logo.svg">
+    </div>
+        <div class="Account">
+            <h2>List of coins</h2>
+    <div class="piechart"></div>
+        </div>
+
+<table class="coin-list">
+  <tr>
+    <th>COIN</th>
+    <th>BTC VALUE</th>
+    <th>USD VALUE</th>
+  </tr>
+    {% for trade in trades %}
+        <tr>
+            <td>{{coin_name}}</td>
+    <td>{{BTC_value}}</td>
+    <td>{{USD_VALUE}}</td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

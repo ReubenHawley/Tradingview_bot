@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <title>Executed trades</title>
+</head>
+<body>
+<div class="topnav">
+  <a href="#">Trade</a>
+  <a href="#">Account</a>
+  <a href="#">performance</a>
+</div>
+    <div class="center">
+        <img class='header' src="https://bin.bnbstatic.com/static/images/common/nav-logo.svg">
+    </div>
+    <div class="row">
+        <div class="column">BTC HOLDINGS: {{btc_holdings}}</div>
+        <div class="column">USDT: {{usdt_balance}}</div>
+        <div class="column">ACCOUNT TOTAL IN USDT: {{total_usdt_value}}</div>
+    </div>
+        <div class="trades">
+            <h2> Executed trades</h2>
+            <table>
+                <tr>
+                    <th>TIMESTAMP</th>
+                    <th>DATETIME</th>
+                    <th>ID</th>
+                    <th>SYMBOL</th>
+                    <th>SIDE</th>
+                    <th>PRICE</th>
+                    <th>AMOUNT</th>
+                    <th>VALUE</th>
+
+                </tr>
+                {% for trade in trades %}
+                    <tr>
+                        <td>{{trade.timestamp}}</td>
+                        <td>{{trade.datetime}}</td>
+                        <td>{{trade.id}}</td>
+                        <td>{{trade.symbol}}</td>
+                        <td>{{trade.side}}</td>
+                        <td>{{trade.price}}</td>
+                        <td>{{trade.amount}}</td>
+                        <td>${{trade.cost}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+
+</body>
+</html>
