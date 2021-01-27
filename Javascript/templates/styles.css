@@ -1,0 +1,71 @@
+.topnav {
+  overflow: hidden;
+  background-color: black;
+}
+
+/* Navbar links */
+.topnav a {
+  float: left;
+  display: block;
+  background:black;
+  color: #ffcc00;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Links - change color on hover */
+.topnav a:hover {
+  background-color: black;
+  color: #fff0b3;
+}
+    body{background:black;
+         font-family: arial;
+         text-align: center;
+         color: white}
+
+    trades{margin: auto;
+           text-align:center;}
+
+    table{background: #ffcc00;
+          color:black;
+          border-radius:25px;
+          margin:auto;}
+
+    td{padding:15px}
+    .header{
+        text-align: center;
+        padding: 20px;}
+
+    /* Create three equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 30%;
+  padding: 15px;
+  background:#ffcc00;
+  border-radius:25px;
+  color:black;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+@media screen and (max-width: 600px) {
+  .column {
+    height:66px;
+    width: 306px;
+  }
+}
+    tr:nth-child(even) {background: #ffcc00}
+    tr:nth-child(odd) {background: #fff0b3}
+    .center {
+        margin: auto;
+        width: 50%;
+        border: 3px solid black;
+        padding: 10px;}
+    th{border-radius:25px;
+    }
+    h2{color:#ffcc00}
