@@ -19,16 +19,6 @@ try:
     binance.apiKey = api_key
     binance.secret = secret
 
-    """ open the config file to retrieve the apikey and secret 
-        instantiate Jeroen bot"""
-    c_dir = os.path.dirname(__file__)
-    with open(os.path.join(c_dir, "config_jeroen.txt")) as key_file:
-        Japi_key, Jsecret, _, _ = key_file.read().splitlines()
-    "Instantiate the exchange"
-    jeroen = ccxt.binance()
-    jeroen.apiKey = Japi_key
-    jeroen.secret = Jsecret
-
     "Instantiate email client"
     email = EmailScanner()
 
@@ -105,18 +95,11 @@ def webhook():
                                                  amount=quantity,
                                                  price=price)
 
-                    jentry_order_response = order(account=jeroen,
-                                                  ticker=symbol,
-                                                  trade_type=order_type,
-                                                  direction=side,
-                                                  amount=quantity,
-                                                  price=price)
                     "prints response to the console"
                     print(f'entry trade submitted: {entry_order_response}')
-                    print(f'entry trade submitted for jeroen: {jentry_order_response}')
                     "sends an email of the executed trade"
                     email.send_report(entry_order_response)
-                    email.send_report(receiver='jankaas25@gmail.com', data=jentry_order_response)
+
 
                 else:
                     insufficient_balance = "order not submitted, balance insufficient"
@@ -134,18 +117,10 @@ def webhook():
                                                  amount=quantity,
                                                  price=price)
 
-                    jexit_order_response = order(account=binance,
-                                                 ticker=symbol,
-                                                 trade_type=order_type,
-                                                 direction=side,
-                                                 amount=quantity,
-                                                 price=price)
                     "prints response to the console"
                     print(f'entry trade submitted: {entry_order_response}')
-                    print(f'entry trade submitted for jeroen: {jexit_order_response}')
                     "sends an email of the executed trade"
                     email.send_report(entry_order_response)
-                    email.send_report(receiver='jankaas25@gmail.com', data=jexit_order_response)
 
             else:
                 insufficient_balance = "order not submitted, balance insufficient"
