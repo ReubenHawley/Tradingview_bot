@@ -2,7 +2,6 @@
 from traceback import print_exc
 from flask import Flask, request, render_template
 from ast import literal_eval
-import os
 from flask_ngrok import run_with_ngrok
 from python.core.Strategy import Strategy
 # Start ngrok when app is run
@@ -21,11 +20,18 @@ app = Flask(__name__)
 def dashboard():
     trades = Reuben.exchange.fetch_my_trades('BTC/USDT')
     trades.reverse()
-    available_balance = Reuben.exchange.fetch_free_balance()['USDT']
+
+    return render_template('Dashboard.html', trades=trades)
+
+
+@app.route('/account')
+# visible dashboard which to view and interact
+def account():
+    available_balance = round((Reuben.exchange.fetch_free_balance()['USDT']),2)
     btc_holdings = Reuben.exchange.fetch_free_balance()['BTC']
-    usdt_value_btc_holdings = btc_holdings * Reuben.exchange.fetch_ticker('BTC/USDT')['close']
-    total_usdt_value = available_balance + usdt_value_btc_holdings
-    return render_template('Dashboard.html', trades=trades,
+    usdt_value_btc_holdings = round((btc_holdings * Reuben.exchange.fetch_ticker('BTC/USDT')['close']), 2)
+    total_usdt_value = round((available_balance + usdt_value_btc_holdings), 2)
+    return render_template('account.html',
                            usdt_balance=available_balance,
                            btc_holdings=Reuben.exchange.fetch_free_balance()['BTC'],
                            total_usdt_value=total_usdt_value,
@@ -34,7 +40,11 @@ def dashboard():
 
 @app.route('/orders')
 def orders():
-    return render_template('orders.html')
+    open_orders = Reuben.exchange.fetch_open_orders("BTC/USDT")
+    btc = Reuben.exchange.fetch_ticker('BTC/USDT')['close']
+    return render_template('orders.html',
+                           open_orders=open_orders,
+                           btc=btc)
 
 
 @app.route('/webhook', methods=['POST'])
