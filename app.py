@@ -28,22 +28,6 @@ except Exception as e:
     print_exc()
 
 
-def order(account, ticker, trade_type, direction, amount, price):
-    try:
-        if trade_type == "MARKET":
-            print(f'sending order: {ticker} - {trade_type} - {direction} - {amount} - {None}')
-            order_receipt = account.create_order(ticker, trade_type, direction, amount, None)
-            return order_receipt
-        elif trade_type == "LIMIT":
-            print(f'sending order: {ticker} - {trade_type} - {direction} - {amount} - {price}')
-            order_receipt = account.create_order(ticker, trade_type, direction, amount, price)
-            return order_receipt
-    except Exception as exception:
-        email.send_report(exception.args)
-        print('type is:', exception.__class__.__name__)
-        print_exc()
-
-
 # actual web server starts here #
 app = Flask(__name__)
 run_with_ngrok(app)
@@ -58,12 +42,17 @@ def dashboard():
     btc_holdings = binance.fetch_free_balance()['BTC']
     usdt_value_btc_holdings = btc_holdings * binance.fetch_ticker('BTC/USDT')['close']
     total_usdt_value = available_balance + usdt_value_btc_holdings
-    return render_template('dashboard.html', trades=trades,
+    return render_template('Dashboard.html', trades=trades,
                            usdt_balance=available_balance,
                            btc_holdings=binance.fetch_free_balance()['BTC'],
                            total_usdt_value=total_usdt_value,
                            )
 
+@app.route('/orders')
+# visible dashboard which to view and interact
+def orders():
+    return render_template('orders.html',
+                           )
 
 # webhook for receiving of orders
 @app.route('/webhook', methods=['POST'])
@@ -74,62 +63,7 @@ def webhook():
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
 
-        "pass the payload to relevant variables to be executed in the order function"
-        base = webhook_message['base']
-        quote = webhook_message['quote']
-        quantity = float(webhook_message['quantity'])
-        order_type = webhook_message['ordertype']
-        side = webhook_message['side']
-        symbol = f'{quote}/{base}'
-        price = webhook_message['price']
-        "do a check to see if the trade is possible"
-        if webhook_message is not None:
-            if side == "BUY":
-                if float(webhook_message['quantity'])*binance.fetch_ticker(symbol)['close'] < \
-                        binance.fetch_free_balance()[base]:
-                    "returns the response from the exchange, whether successful or not"
-                    entry_order_response = order(account=binance,
-                                                 ticker=symbol,
-                                                 trade_type=order_type,
-                                                 direction=side,
-                                                 amount=quantity,
-                                                 price=price)
 
-                    "prints response to the console"
-                    print(f'entry trade submitted: {entry_order_response}')
-                    "sends an email of the executed trade"
-                    email.send_report(entry_order_response)
-
-
-                else:
-                    insufficient_balance = "order not submitted, balance insufficient"
-                    email.send_report(insufficient_balance)
-                    print(insufficient_balance)
-
-            elif side == "SELL":
-                if quantity < binance.fetch_free_balance()[quote]:
-                    print(f"{symbol}-{order_type}-{side}-{quantity}-{price}")
-                    "returns the response from the exchange, whether successful or not"
-                    entry_order_response = order(account=binance,
-                                                 ticker=symbol,
-                                                 trade_type=order_type,
-                                                 direction=side,
-                                                 amount=quantity,
-                                                 price=price)
-
-                    "prints response to the console"
-                    print(f'entry trade submitted: {entry_order_response}')
-                    "sends an email of the executed trade"
-                    email.send_report(entry_order_response)
-
-            else:
-                insufficient_balance = "order not submitted, balance insufficient"
-                email.send_report(insufficient_balance)
-                print(insufficient_balance)
-
-            return webhook_message
-        else:
-            return "None type received, catching error"
     except Exception as error:
         print('type is:', error.__class__.__name__)
         print_exc()
