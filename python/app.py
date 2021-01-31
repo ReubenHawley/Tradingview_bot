@@ -1,68 +1,51 @@
 #!/usr/bin/python3
 from traceback import print_exc
 from flask import Flask, request, render_template
-import ccxt
-import os
 from ast import literal_eval
+import os
 from flask_ngrok import run_with_ngrok
-from python.core import EmailScanner
-
+from python.core.Strategy import Strategy
 # Start ngrok when app is run
-try:
-    """ open the config file to retrieve the apikey and secret 
-    instantiate Reuben bot"""
-    c_dir = os.path.dirname(__file__)
-    with open(os.path.join(c_dir, "../config.txt")) as key_file:
-        api_key, secret, _, _ = key_file.read().splitlines()
-    "Instantiate the exchange"
-    binance = ccxt.binance()
-    binance.apiKey = api_key
-    binance.secret = secret
-
-    "Instantiate email client"
-    email = EmailScanner()
 
 
-except Exception as e:
-    print('type is:', e.__class__.__name__)
-    print_exc()
-
+Reuben = Strategy()
 
 # actual web server starts here #
 app = Flask(__name__)
-run_with_ngrok(app)
+#run_with_ngrok(app)
 
 
 @app.route('/')
+@app.route('/dashboard/')
 # visible dashboard which to view and interact
 def dashboard():
-    trades = binance.fetch_my_trades('BTC/USDT')
+    trades = Reuben.exchange.fetch_my_trades('BTC/USDT')
     trades.reverse()
-    available_balance = binance.fetch_free_balance()['USDT']
-    btc_holdings = binance.fetch_free_balance()['BTC']
-    usdt_value_btc_holdings = btc_holdings * binance.fetch_ticker('BTC/USDT')['close']
+    available_balance = Reuben.exchange.fetch_free_balance()['USDT']
+    btc_holdings = Reuben.exchange.fetch_free_balance()['BTC']
+    usdt_value_btc_holdings = btc_holdings * Reuben.exchange.fetch_ticker('BTC/USDT')['close']
     total_usdt_value = available_balance + usdt_value_btc_holdings
     return render_template('Dashboard.html', trades=trades,
                            usdt_balance=available_balance,
-                           btc_holdings=binance.fetch_free_balance()['BTC'],
+                           btc_holdings=Reuben.exchange.fetch_free_balance()['BTC'],
                            total_usdt_value=total_usdt_value,
                            )
 
-@app.route('/orders')
-# visible dashboard which to view and interact
-def orders():
-    return render_template('orders.html',
-                           )
 
-# webhook for receiving of orders
+@app.route('/orders')
+def orders():
+    return render_template('orders.html')
+
+
 @app.route('/webhook', methods=['POST'])
+# webhook for receiving of orders
 def webhook():
     try:
         " capture the webhook through a listener into a variable called webhook_message"
         webhook_message = request.data
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
-
+        Reuben.execute(webhook_message)
 
     except Exception as error:
         print('type is:', error.__class__.__name__)

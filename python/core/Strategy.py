@@ -1,8 +1,13 @@
-class Strategy:
-    def __init__(self, account, webhook_message, email):
-        self.account = account
-        self.webhook_message = webhook_message
-        self.email = email()
+from .account import Account
+from .Email import EmailScanner
+
+
+class Strategy(Account, EmailScanner):
+    def __init__(self):
+        super().__init__()
+        self.user = Account()
+        self.account = self.user.exchange
+        self.email = EmailScanner()
 
     def order(self, ticker, trade_type, direction, amount, price):
         try:
@@ -18,19 +23,19 @@ class Strategy:
             self.email.send_report(exception.args)
             print('type is:', exception.__class__.__name__)
 
-    def execute(self):
+    def execute(self, webhook_message):
         """pass the payload to relevant variables to be executed in the order function"""
-        base = self.webhook_message['base']
-        quote = self.webhook_message['quote']
-        quantity = float(self.webhook_message['quantity'])
-        order_type = self.webhook_message['ordertype']
-        side = self.webhook_message['side']
+        base = webhook_message['base']
+        quote = webhook_message['quote']
+        quantity = float(webhook_message['quantity'])
+        order_type = webhook_message['ordertype']
+        side = webhook_message['side']
         symbol = f'{quote}/{base}'
-        price = self.webhook_message['price']
+        price = webhook_message['price']
         "do a check to see if the trade is possible"
-        if self.webhook_message is not None:
+        if webhook_message is not None:
             if side == "BUY":
-                if float(self.webhook_message['quantity']) * self.account.fetch_ticker(symbol)['close'] < \
+                if float(webhook_message['quantity']) * self.account.fetch_ticker(symbol)['close'] < \
                         self.account.fetch_free_balance()[base]:
                     "returns the response from the exchange, whether successful or not"
                     entry_order_response = self.order(ticker=symbol,
@@ -69,6 +74,6 @@ class Strategy:
                 self.email.send_report(insufficient_balance)
                 print(insufficient_balance)
 
-            return self.webhook_message
+            return webhook_message
         else:
             return "None type received, catching error"

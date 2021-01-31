@@ -1,4 +1,4 @@
-from ImapClient import ImapClient
+from .ImapClient import ImapClient
 import os
 import sys
 import smtplib
