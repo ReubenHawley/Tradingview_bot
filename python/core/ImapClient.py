@@ -15,7 +15,7 @@ class ImapClient:
                  move_to_trash=True):
         # check for required param
         self.c_dir = os.path.dirname(__file__)
-        with open(os.path.join(self.c_dir, "config.txt")) as key_file:
+        with open(os.path.join(self.c_dir, "../../config.txt")) as key_file:
             _, _, _, self.pwd = key_file.read().splitlines()
         if not recipient:
             raise ValueError('You must provide a recipient email address')

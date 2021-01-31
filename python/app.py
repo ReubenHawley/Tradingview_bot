@@ -5,14 +5,14 @@ import ccxt
 import os
 from ast import literal_eval
 from flask_ngrok import run_with_ngrok
-from Email import EmailScanner
+from python.core import EmailScanner
 
 # Start ngrok when app is run
 try:
     """ open the config file to retrieve the apikey and secret 
     instantiate Reuben bot"""
     c_dir = os.path.dirname(__file__)
-    with open(os.path.join(c_dir, "config.txt")) as key_file:
+    with open(os.path.join(c_dir, "../config.txt")) as key_file:
         api_key, secret, _, _ = key_file.read().splitlines()
     "Instantiate the exchange"
     binance = ccxt.binance()
