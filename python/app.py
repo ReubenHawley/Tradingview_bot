@@ -41,6 +41,7 @@ def account():
 @app.route('/orders')
 def orders():
     open_orders = Reuben.exchange.fetch_open_orders("BTC/USDT")
+    open_orders.reverse()
     btc = Reuben.exchange.fetch_ticker('BTC/USDT')['close']
     return render_template('orders.html',
                            open_orders=open_orders,
@@ -55,8 +56,8 @@ def webhook():
         webhook_message = request.data
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
-        Reuben.execute(webhook_message)
-
+        response = Reuben.execute(webhook_message)
+        return response
     except Exception as error:
         print('type is:', error.__class__.__name__)
         print_exc()

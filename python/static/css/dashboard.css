@@ -50,7 +50,6 @@ body {
 
 .sidebar .nav-link.active {
   background:black;
-  color: #007bff;
 }
 
 .sidebar .nav-link:hover .feather,
@@ -95,8 +94,10 @@ body {
   border-color: transparent;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
-.trades:nth-child(even) {background: #ffcc00}
-.trades:nth-child(odd) {background: #fff0b3}
+.trades:nth-child(even) {background: #ffcc00;
+                         color: #fff0b3}
+.trades:nth-child(odd) {background: #fff0b3;
+                        color: #ffcc00}
 /*
  * Utilities
  */
