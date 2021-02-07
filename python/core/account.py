@@ -17,7 +17,29 @@ class Account:
         self.exchange.apiKey = self.api_key
         self.exchange.secret = self.secret
 
+    def outstanding_on_order(self, symbol='BTC/USDT'):
+        open_orders = self.exchange.fetch_open_orders(symbol)
+        outstanding = 0
+        for order in open_orders:
+            outstanding += order['remaining']
+        close = self.exchange.fetch_ticker(symbol)['close']
+        on_order = outstanding * close
+        return on_order
 
-if __name__ == '__main__':
-    reuben = Account()
-    print(reuben.exchange)
+    def btc_holdings(self):
+        btc_holdings = self.exchange.fetch_free_balance()['BTC']
+        on_order = self.outstanding_on_order()
+        total = btc_holdings + on_order
+        return round(total, 2)
+
+    def account_value(self):
+        available_balance = round((self.exchange.fetch_free_balance()['USDT']), 2)
+        btc_holdings = self.exchange.fetch_free_balance()['BTC']
+        usdt_value_btc_holdings = round((btc_holdings * self.exchange.fetch_ticker('BTC/USDT')['close']), 2)
+        on_order = self.outstanding_on_order()
+        total_usdt_value = round((available_balance + usdt_value_btc_holdings + on_order), 2)
+        return total_usdt_value
+
+    def available_balance(self):
+        available_balance = round((self.exchange.fetch_free_balance()['USDT']), 2)
+        return available_balance
