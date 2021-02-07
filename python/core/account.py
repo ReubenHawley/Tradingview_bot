@@ -17,7 +17,16 @@ class Account:
         self.exchange.apiKey = self.api_key
         self.exchange.secret = self.secret
 
+    def outstanding_on_order(self, symbol='BTC/USDT'):
+        open_orders = self.exchange.fetch_open_orders(symbol)
+        outstanding = 0
+        for order in open_orders:
+            outstanding += order['remaining']
+        close = self.exchange.fetch_ticker(symbol)['close']
+        on_order = outstanding * close
+        return on_order
+
 
 if __name__ == '__main__':
     reuben = Account()
-    print(reuben.exchange)
+    print(reuben.outstanding_on_order())

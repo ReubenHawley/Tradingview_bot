@@ -34,7 +34,8 @@ def account():
     available_balance = round((user2.exchange.fetch_free_balance()['USDT']), 2)
     btc_holdings = user2.exchange.fetch_free_balance()['BTC']
     usdt_value_btc_holdings = round((btc_holdings * user2.exchange.fetch_ticker('BTC/USDT')['close']), 2)
-    total_usdt_value = round((available_balance + usdt_value_btc_holdings), 2)
+    on_order = user2.outstanding_on_order()
+    total_usdt_value = round((available_balance + usdt_value_btc_holdings + on_order), 2)
     return render_template('account.html',
                            usdt_balance=available_balance,
                            btc_holdings=user2.exchange.fetch_free_balance()['BTC'],
