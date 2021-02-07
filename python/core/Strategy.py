@@ -3,9 +3,9 @@ from .Email import EmailScanner
 
 
 class Strategy(Account, EmailScanner):
-    def __init__(self):
+    def __init__(self, account):
         super().__init__()
-        self.user = Account()
+        self.user = Account(account)
         self.account = self.user.exchange
         self.email = EmailScanner()
 
@@ -47,11 +47,11 @@ class Strategy(Account, EmailScanner):
                     "prints response to the console"
                     print(f'entry trade submitted: {entry_order_response}')
                     "sends an email of the executed trade"
-                    self.email.send_report(entry_order_response)
+                    # self.email.send_report(entry_order_response)
 
                 else:
                     insufficient_balance = "order not submitted, balance insufficient"
-                    self.email.send_report(insufficient_balance)
+                    # self.email.send_report(insufficient_balance)
                     print(insufficient_balance)
 
             elif side == "SELL":
@@ -67,11 +67,11 @@ class Strategy(Account, EmailScanner):
                     "prints response to the console"
                     print(f'entry trade submitted: {entry_order_response}')
                     "sends an email of the executed trade"
-                    self.email.send_report(entry_order_response)
+                    # self.email.send_report(entry_order_response)
 
             else:
                 insufficient_balance = "order not submitted, balance insufficient"
-                self.email.send_report(insufficient_balance)
+                # self.email.send_report(insufficient_balance)
                 print(insufficient_balance)
 
             return webhook_message

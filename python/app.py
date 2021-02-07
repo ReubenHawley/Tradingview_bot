@@ -4,21 +4,25 @@ from flask import Flask, request, render_template
 from ast import literal_eval
 from flask_ngrok import run_with_ngrok
 from python.core.Strategy import Strategy
+from threading import Thread
+
+
 # Start ngrok when app is run
-
-
-Reuben = Strategy()
+user1_config = '../../config_user1.txt'
+user2_config = '../../config.txt'
+user2 = Strategy(account=user2_config)
+user1 = Strategy(account=user1_config)
 
 # actual web server starts here #
 app = Flask(__name__)
-#run_with_ngrok(app)
+run_with_ngrok(app)
 
 
 @app.route('/')
 @app.route('/dashboard/')
 # visible dashboard which to view and interact
 def dashboard():
-    trades = Reuben.exchange.fetch_my_trades('BTC/USDT')
+    trades = user2.exchange.fetch_my_trades('BTC/USDT')
     trades.reverse()
 
     return render_template('Dashboard.html', trades=trades)
@@ -27,22 +31,22 @@ def dashboard():
 @app.route('/account')
 # visible dashboard which to view and interact
 def account():
-    available_balance = round((Reuben.exchange.fetch_free_balance()['USDT']),2)
-    btc_holdings = Reuben.exchange.fetch_free_balance()['BTC']
-    usdt_value_btc_holdings = round((btc_holdings * Reuben.exchange.fetch_ticker('BTC/USDT')['close']), 2)
+    available_balance = round((user2.exchange.fetch_free_balance()['USDT']), 2)
+    btc_holdings = user2.exchange.fetch_free_balance()['BTC']
+    usdt_value_btc_holdings = round((btc_holdings * user2.exchange.fetch_ticker('BTC/USDT')['close']), 2)
     total_usdt_value = round((available_balance + usdt_value_btc_holdings), 2)
     return render_template('account.html',
                            usdt_balance=available_balance,
-                           btc_holdings=Reuben.exchange.fetch_free_balance()['BTC'],
+                           btc_holdings=user2.exchange.fetch_free_balance()['BTC'],
                            total_usdt_value=total_usdt_value,
                            )
 
 
 @app.route('/orders')
 def orders():
-    open_orders = Reuben.exchange.fetch_open_orders("BTC/USDT")
+    open_orders = user2.exchange.fetch_open_orders("BTC/USDT")
     open_orders.reverse()
-    btc = Reuben.exchange.fetch_ticker('BTC/USDT')['close']
+    btc = user2.exchange.fetch_ticker('BTC/USDT')['close']
     return render_template('orders.html',
                            open_orders=open_orders,
                            btc=btc)
@@ -56,8 +60,12 @@ def webhook():
         webhook_message = request.data
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
-        response = Reuben.execute(webhook_message)
-        return response
+        response = Thread(target=user2.execute, args=(webhook_message,))
+        response.start()
+        response2 = Thread(target=user1.execute, args=(webhook_message,))
+        response2.start()
+        return f"{response}\n {response2}"
+
     except Exception as error:
         print('type is:', error.__class__.__name__)
         print_exc()
