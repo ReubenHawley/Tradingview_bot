@@ -224,7 +224,7 @@ if __name__ == '__main__':
     email_password = input('please enter your email password ')
     values = [API_ID, API_KEY, email_address, email_password]
 
-    outF = open("config.txt", "w")
+    outF = open("../config.txt", "w")
     for line in values:
         # write line to output file
         outF.write(line)

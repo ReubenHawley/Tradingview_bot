@@ -1,4 +1,4 @@
-from ImapClient import ImapClient
+from .ImapClient import ImapClient
 import os
 import sys
 import smtplib
@@ -9,7 +9,7 @@ class EmailScanner:
     def __init__(self):
         try:
             self.c_dir = os.path.dirname(__file__)
-            with open(os.path.join(self.c_dir, "config.txt")) as key_file:
+            with open(os.path.join(self.c_dir, "../../config.txt")) as key_file:
                 _, _, self.username, self.pw = key_file.read().splitlines()
             self.imap = ImapClient(recipient=self.username)
             self.messages = None
