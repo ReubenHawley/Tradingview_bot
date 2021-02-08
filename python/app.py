@@ -10,7 +10,10 @@ from threading import Thread
 # Start ngrok when app is run
 
 user2_config = '../../config.txt'
+user1_config = '../../config_jeroen.txt'
+user1 = Strategy(account=user1_config)
 user2 = Strategy(account=user2_config)
+
 
 
 # actual web server starts here #
@@ -58,7 +61,9 @@ def webhook():
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         response = Thread(target=user2.execute, args=(webhook_message,))
         response.start()
-        return f"{response}"
+        response2 = Thread(target=user1.execute, args=(webhook_message,))
+        response2.start()
+        return f"{response} \n {response2}"
 
     except Exception as error:
         print('type is:', error.__class__.__name__)
