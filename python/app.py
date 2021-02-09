@@ -17,6 +17,10 @@ user1_config = '../../config_jeroen.txt'
 account1 = Account(user1_config)
 user1 = Strategy(account=account1)
 
+user3_config = '../../config_reuben.txt'
+account3 = Account(user3_config)
+user3 = Strategy(account=account3)
+
 """TRADE PARAMETERS"""
 SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 100},
                {"symbol": "BNB/USDT", "max_trades": 20}]
@@ -30,27 +34,31 @@ run_with_ngrok(app)
 @app.route('/dashboard/')
 # visible dashboard which to view and interact
 def dashboard():
-    trades = user2.exchange.fetch_my_trades('BTC/USDT')
+    trades = []
+    for symbol in SYMBOL_LIST:
+        trades += user3.exchange.fetch_my_trades(symbol["symbol"])
     trades.reverse()
 
-    return render_template('Dashboard.html', trades=trades)
+    return render_template('Dashboard.html', trades=trades, symbols=SYMBOL_LIST)
 
 
 @app.route('/account')
 # visible dashboard which to view and interact
 def account():
     return render_template('account.html',
-                           usdt_balance=user2.available_balance(),
-                           btc_holdings=user2.btc_holdings(),
-                           total_usdt_value=user2.account_value(),
+                           usdt_balance=user3.available_balance(),
+                           btc_holdings=user3.btc_holdings(),
+                           total_usdt_value=user3.account_value(),
                            )
 
 
 @app.route('/orders')
 def orders():
-    open_orders = user2.exchange.fetch_open_orders("BTC/USDT")
+    open_orders = []
+    for symbol in SYMBOL_LIST:
+        open_orders += user3.exchange.fetch_open_orders(symbol['symbol'])
     open_orders.reverse()
-    btc = user2.exchange.fetch_ticker('BTC/USDT')['close']
+    btc = user3.exchange.fetch_ticker('BTC/USDT')['close']
     return render_template('orders.html',
                            open_orders=open_orders,
                            btc=btc)
@@ -66,6 +74,7 @@ def webhook():
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         for symbol in SYMBOL_LIST:
             Thread(target=user2.market_maker, args=(symbol['symbol'], symbol['max_trades'], webhook_message,)).start()
+            Thread(target=user3.market_maker, args=(symbol['symbol'], symbol['max_trades'], webhook_message,)).start()
         Thread(target=user1.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
         return f"Trade successfully executed"
 
