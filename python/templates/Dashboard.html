@@ -59,6 +59,9 @@
           <h2>Executed Trades</h2>
           <div class="table-responsive">
             <table class="table table-striped table-sm">
+                <thead>
+                <tr>{% for symbol in symbols%}</tr>
+                </thead>
               <thead>
                 <tr>
                   <th>TIMESTAMP</th>
@@ -73,7 +76,7 @@
               </thead>
               <tbody>
                 {% for trade in trades %}
-                    <tr>
+                    <tr class="trades">
                         <td>{{trade.timestamp}}</td>
                         <td>{{trade.datetime}}</td>
                         <td>{{trade.id}}</td>
@@ -84,7 +87,7 @@
                         <td>${{trade.cost}}</td>
                     </tr>
                 {% endfor %}
-
+                {% endfor %}
               </tbody>
             </table>
           </div>
