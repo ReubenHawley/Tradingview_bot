@@ -1,12 +1,10 @@
 import os
-from .Email import EmailScanner
 import ccxt
 
 
 class Account:
     def __init__(self, config="../../config.txt"):
         """Instantiate email client"""
-        self.email = EmailScanner()
         """ open the config file to retrieve the apikey and secret 
         instantiate Reuben bot"""
         self.c_dir = os.path.dirname(__file__)
