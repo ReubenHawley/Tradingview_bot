@@ -25,7 +25,7 @@ run_with_ngrok(app)
 @app.route('/dashboard/')
 # visible dashboard which to view and interact
 def dashboard():
-    trades = user2.exchange.fetch_my_trades('BTC/USDT')
+    trades = user2.exchange.fetch_my_trades()
     trades.reverse()
 
     return render_template('Dashboard.html', trades=trades)
@@ -43,12 +43,12 @@ def account():
 
 @app.route('/orders')
 def orders():
-    open_orders = user2.exchange.fetch_open_orders("BTC/USDT")
+    open_orders = user2.exchange.fetch_open_orders()
     open_orders.reverse()
     btc = user2.exchange.fetch_ticker('BTC/USDT')['close']
     return render_template('orders.html',
                            open_orders=open_orders,
-                           btc=btc)
+                           )
 
 
 @app.route('/webhook', methods=['POST'])
