@@ -54,9 +54,9 @@ class Strategy(Account):
         position_type = webhook_message['position_type']
         amount = self.order_amount(quantity, position_type)
         "do a check to see if the trade is possible"
-        if len(self.exchange.fetch_open_orders(trade_symbol)) < max_trades:
-            if symbol == trade_symbol:
-                if webhook_message is not None:
+        if webhook_message is not None:
+            if len(self.exchange.fetch_open_orders(trade_symbol)) < max_trades:
+                if symbol == trade_symbol:
                     if side == "BUY":
                         if float(amount) * self.account.fetch_ticker(symbol)['close'] < \
                                 self.account.fetch_free_balance()[base]:
@@ -97,16 +97,14 @@ class Strategy(Account):
                         insufficient_balance = "order not submitted, balance insufficient"
                         # email.send_report(insufficient_balance)
                         print(insufficient_balance)
-
-                    return webhook_message
+                    return '200'
                 else:
-                    return "None type received, catching error"
+                    print('order received for different strategy')
             else:
-                print('order received for different strategy')
+                print('max open trades for this strategy reached,wait for orders to be executed')
         else:
-            print('max open trades for this strategy reached,wait for orders to be executed')
+            return "None type received, catching error"
 
     def __str__(self):
         return f"Strategy for user:{self.user}"
     # takes a strategy as an input and a webhook message for order routing
-
