@@ -7,11 +7,11 @@ class Strategy(Account):
         self.user = account
         self.account = self.user.exchange
 
-    def order_amount(self, amount, position_type):
+    def order_amount(self, symbol, amount, position_type):
         try:
             if position_type == 'relative':
                 usdt_amount = (self.user.exchange.fetch_free_balance()['USDT'] / 100) * amount
-                positional_amount = float(usdt_amount / self.user.exchange.fetch_ticker("BTC/USDT")['close'])
+                positional_amount = float(usdt_amount / self.user.exchange.fetch_ticker(symbol)['close'])
                 return positional_amount
             elif position_type == 'absolute':
                 positional_amount = float(amount)
@@ -52,7 +52,7 @@ class Strategy(Account):
         symbol = f'{quote}/{base}'
         price = webhook_message['price']
         position_type = webhook_message['position_type']
-        amount = self.order_amount(quantity, position_type)
+        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
         "do a check to see if the trade is possible"
         if webhook_message is not None:
             if len(self.exchange.fetch_open_orders(trade_symbol)) < max_trades:
