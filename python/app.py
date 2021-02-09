@@ -36,10 +36,10 @@ run_with_ngrok(app)
 def dashboard():
     trades = []
     for symbol in SYMBOL_LIST:
-        trades += user3.exchange.fetch_my_trades(symbol["symbol"])
-    trades.reverse()
+      trades += user2.exchange.fetch_my_trades(symbol["symbol"])
+      trades.reverse()
 
-    return render_template('Dashboard.html', trades=trades, symbols=SYMBOL_LIST)
+    return render_template('Dashboard.html', trades=trades,     symbols=SYMBOL_LIST)
 
 
 @app.route('/account')
@@ -56,7 +56,8 @@ def account():
 def orders():
     open_orders = []
     for symbol in SYMBOL_LIST:
-        open_orders += user3.exchange.fetch_open_orders(symbol['symbol'])
+      HFT_state_change
+      open_orders += user3.exchange.fetch_open_orders(symbol['symbol'])
     open_orders.reverse()
     btc = user3.exchange.fetch_ticker('BTC/USDT')['close']
     return render_template('orders.html',
