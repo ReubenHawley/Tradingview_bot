@@ -57,7 +57,7 @@ class Strategy(Account, EmailScanner):
         position_type = webhook_message['position_type']
         amount = self.order_amount(quantity, position_type)
         "do a check to see if the trade is possible"
-        if len(self.exchange.fetch_open_orders("BTC/USDT")) < max_trades:
+        if len(self.exchange.fetch_open_orders(trade_symbol)) < max_trades:
             if symbol == trade_symbol:
                 if webhook_message is not None:
                     if side == "BUY":

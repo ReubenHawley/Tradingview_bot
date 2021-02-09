@@ -11,6 +11,9 @@ user2_config = '../../config.txt'
 account2 = Account(user2_config)
 user2 = Strategy(account=account2)
 
+user1_config = '../../config_jeroen.txt'
+account1 = Account(user1_config)
+user1 = Strategy(account=account1)
 
 
 # actual web server starts here #
@@ -57,6 +60,8 @@ def webhook():
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         Thread(target=user2.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
+        Thread(target=user1.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
+        Thread(target=user2.market_maker, args=("BNB/USDT", 20, webhook_message,)).start()
         return f"Trade successfully executed"
 
 
