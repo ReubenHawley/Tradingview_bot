@@ -6,12 +6,7 @@ from flask_ngrok import run_with_ngrok
 from python.core.Strategy import Strategy
 from threading import Thread
 
-
-# Start ngrok when app is run
-
 user2_config = '../../config.txt'
-user1_config = '../../config_jeroen.txt'
-user1 = Strategy(account=user1_config)
 user2 = Strategy(account=user2_config)
 
 
@@ -61,9 +56,7 @@ def webhook():
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         response = Thread(target=user2.execute, args=(webhook_message,))
         response.start()
-        response2 = Thread(target=user1.execute, args=(webhook_message,))
-        response2.start()
-        return f"{response} \n {response2}"
+        return f"{response}"
 
     except Exception as error:
         print('type is:', error.__class__.__name__)
