@@ -25,7 +25,7 @@ run_with_ngrok(app)
 @app.route('/dashboard/')
 # visible dashboard which to view and interact
 def dashboard():
-    trades = user2.exchange.fetch_my_trades()
+    trades = user2.exchange.fetch_my_trades('BTC/USDT')
     trades.reverse()
 
     return render_template('Dashboard.html', trades=trades)
@@ -43,12 +43,12 @@ def account():
 
 @app.route('/orders')
 def orders():
-    open_orders = user2.exchange.fetch_open_orders()
+    open_orders = user2.exchange.fetch_open_orders("BTC/USDT")
     open_orders.reverse()
     btc = user2.exchange.fetch_ticker('BTC/USDT')['close']
     return render_template('orders.html',
                            open_orders=open_orders,
-                           )
+                           btc=btc)
 
 
 @app.route('/webhook', methods=['POST'])
@@ -61,9 +61,8 @@ def webhook():
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         Thread(target=user2.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
         Thread(target=user1.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
-        Thread(target=user2.market_maker, args=("BNB/USDT", 10, webhook_message,)).start()
-        Thread(target=user2.market_maker, args=("ETH/USDT", 20, webhook_message,)).start()
-        Thread(target=user2.market_maker, args=("DOT/USDT", 10, webhook_message,)).start()
+        Thread(target=user2.market_maker, args=("BNB/USDT", 20, webhook_message,)).start()
+
         return f"Trade successfully executed"
 
     except Exception as error:
