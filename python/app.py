@@ -7,6 +7,8 @@ from python.core.Strategy import Strategy
 from threading import Thread
 from python.core.account import Account
 
+
+""" USER SETTINGS """
 user2_config = '../../config.txt'
 account2 = Account(user2_config)
 user2 = Strategy(account=account2)
@@ -15,6 +17,9 @@ user1_config = '../../config_jeroen.txt'
 account1 = Account(user1_config)
 user1 = Strategy(account=account1)
 
+"""TRADE PARAMETERS"""
+SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 100},
+               {"symbol": "BNB/USDT", "max_trades": 20}]
 
 # actual web server starts here #
 app = Flask(__name__)
@@ -59,10 +64,9 @@ def webhook():
         webhook_message = request.data
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
-        Thread(target=user2.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
+        for symbol in SYMBOL_LIST:
+            Thread(target=user2.market_maker, args=(symbol['symbol'], symbol['max_trades'], webhook_message,)).start()
         Thread(target=user1.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
-        Thread(target=user2.market_maker, args=("BNB/USDT", 20, webhook_message,)).start()
-
         return f"Trade successfully executed"
 
     except Exception as error:
@@ -74,4 +78,3 @@ if __name__ == '__main__':
     "instantiate the flask app in debug mode"
     app.debug = True
     app.run()
-
