@@ -5,15 +5,15 @@ from ast import literal_eval
 from flask_ngrok import run_with_ngrok
 from python.core.Strategy import Strategy
 from threading import Thread
-
-
-# Start ngrok when app is run
+from python.core.account import Account
 
 user2_config = '../../config.txt'
-user1_config = '../../config_jeroen.txt'
-user1 = Strategy(account=user1_config)
-user2 = Strategy(account=user2_config)
+account2 = Account(user2_config)
+user2 = Strategy(account=account2)
 
+user1_config = '../../config_jeroen.txt'
+account1 = Account(user1_config)
+user1 = Strategy(account=account1)
 
 
 # actual web server starts here #
@@ -59,11 +59,11 @@ def webhook():
         webhook_message = request.data
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
-        response = Thread(target=user2.execute, args=(webhook_message,))
-        response.start()
-        response2 = Thread(target=user1.execute, args=(webhook_message,))
-        response2.start()
-        return f"{response} \n {response2}"
+        Thread(target=user2.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
+        Thread(target=user1.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
+        Thread(target=user2.market_maker, args=("BNB/USDT", 20, webhook_message,)).start()
+        return f"Trade successfully executed"
+
 
     except Exception as error:
         print('type is:', error.__class__.__name__)
