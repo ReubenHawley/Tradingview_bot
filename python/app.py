@@ -5,10 +5,11 @@ from ast import literal_eval
 from flask_ngrok import run_with_ngrok
 from python.core.Strategy import Strategy
 from threading import Thread
+from python.core.account import Account
 
 user2_config = '../../config.txt'
-user2 = Strategy(account=user2_config)
-
+account2 = Account(user2_config)
+user2 = Strategy(account=account2)
 
 
 # actual web server starts here #

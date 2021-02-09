@@ -5,7 +5,7 @@ from .Email import EmailScanner
 class Strategy(Account, EmailScanner):
     def __init__(self, account):
         super().__init__()
-        self.user = Account(account)
+        self.user = account
         self.account = self.user.exchange
         self.email = EmailScanner()
 
@@ -101,4 +101,3 @@ class Strategy(Account, EmailScanner):
             return webhook_message
         else:
             return "None type received, catching error"
-
