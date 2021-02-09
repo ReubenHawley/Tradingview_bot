@@ -1,13 +1,11 @@
 from .account import Account
-from .Email import EmailScanner
 
 
-class Strategy(Account, EmailScanner):
+class Strategy(Account):
     def __init__(self, account):
         super().__init__()
         self.user = account
         self.account = self.user.exchange
-        self.email = EmailScanner()
 
     def order_amount(self, amount, position_type):
         try:
@@ -42,7 +40,6 @@ class Strategy(Account, EmailScanner):
                 return order_receipt
 
         except Exception as exception:
-            self.email.send_report(exception.args)
             print('type is:', exception.__class__.__name__)
 
     def market_maker(self, trade_symbol, max_trades, webhook_message):
