@@ -99,7 +99,7 @@ class Strategy(Account):
                         print(insufficient_balance)
                     return '200'
                 else:
-                    print('order received for different strategy')
+                    print(f'order received for {symbol} but strategy is on {trade_symbol}')
             else:
                 print('max open trades for this strategy reached,wait for orders to be executed')
         else:
