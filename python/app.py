@@ -63,7 +63,6 @@ def webhook():
         Thread(target=user1.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
         Thread(target=user2.market_maker, args=("BNB/USDT", 20, webhook_message,)).start()
         Thread(target=user2.market_maker, args=("SFP/USDT", 10, webhook_message,)).start()
-        Thread(target=user2.market_maker, args=("BNB/USDT", 20, webhook_message,)).start()
         Thread(target=user2.market_maker, args=("DOT/USDT", 10, webhook_message,)).start()
         return f"Trade successfully executed"
 
