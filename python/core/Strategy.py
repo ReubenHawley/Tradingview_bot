@@ -99,9 +99,10 @@ class Strategy(Account):
                         print(insufficient_balance)
                     return '200'
                 else:
-                    print(f'order received for {symbol} but strategy is on {trade_symbol}')
+                    print(f'order received for symbol:{symbol} but strategy is of symbol:{trade_symbol} ')
             else:
-                print('max open trades for this strategy reached,wait for orders to be executed')
+                print(f'{max_trades} open trades allowed, current open trades: '
+                      f'{len(self.exchange.fetch_open_orders(trade_symbol))}')
         else:
             return "None type received, catching error"
 
