@@ -12,6 +12,7 @@ account2 = Account(user2_config)
 user2 = Strategy(account=account2)
 
 
+
 # actual web server starts here #
 app = Flask(__name__)
 run_with_ngrok(app)
@@ -55,9 +56,9 @@ def webhook():
         webhook_message = request.data
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
-        response = Thread(target=user2.execute, args=(webhook_message,))
-        response.start()
-        return f"{response}"
+        Thread(target=user2.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
+        return f"Trade successfully executed"
+
 
     except Exception as error:
         print('type is:', error.__class__.__name__)
