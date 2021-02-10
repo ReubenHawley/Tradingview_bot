@@ -3,21 +3,21 @@ from traceback import print_exc
 from flask import Flask, request, render_template
 from ast import literal_eval
 from flask_ngrok import run_with_ngrok
+import threading
 from python.core.Strategy import Strategy
-from threading import Thread
 from python.core.account import Account
 
 
 """ USER SETTINGS """
-user2_config = '../../config.txt'
+user2_config = '../config.txt'
 account2 = Account(user2_config)
 user2 = Strategy(account=account2)
 
-user1_config = '../../config_jeroen.txt'
+user1_config = '../config_jeroen.txt'
 account1 = Account(user1_config)
 user1 = Strategy(account=account1)
 
-user3_config = '../../config_reuben.txt'
+user3_config = '../config_reuben.txt'
 account3 = Account(user3_config)
 user3 = Strategy(account=account3)
 
@@ -75,9 +75,16 @@ def webhook():
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         for symbol in SYMBOL_LIST:
-            user2.market_maker(symbol['symbol'], symbol['max_trades'], webhook_message)
-            user3.market_maker(symbol['symbol'], symbol['max_trades'], webhook_message)
-        user1.market_maker('BTC/USDT', 100, webhook_message)
+            t1 = threading.Thread(target=user2.market_maker, args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
+            t2 = threading.Thread(target=user3.market_maker,
+                        args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
+            t1.start()
+            t2.start()
+            t1.join()
+            t2.join()
+        t3 = threading.Thread(target=user1.market_maker,args=('BTC/USDT', 100, webhook_message,))
+        t3.start()
+        t3.join()
         return f"Trade successfully executed"
 
     except Exception as error:
