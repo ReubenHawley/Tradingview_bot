@@ -3,8 +3,8 @@ from traceback import print_exc
 from flask import Flask, request, render_template
 from ast import literal_eval
 from flask_ngrok import run_with_ngrok
+import threading
 from python.core.Strategy import Strategy
-from threading import Thread
 from python.core.account import Account
 
 
@@ -74,9 +74,16 @@ def webhook():
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         for symbol in SYMBOL_LIST:
-            user2.market_maker(symbol['symbol'], symbol['max_trades'], webhook_message)
-            user3.market_maker(symbol['symbol'], symbol['max_trades'], webhook_message)
-        user1.market_maker('BTC/USDT', 100, webhook_message)
+            t1 = threading.Thread(target=user2.market_maker, args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
+            t2 = threading.Thread(target=user3.market_maker,
+                        args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
+            t1.start()
+            t2.start()
+            t1.join()
+            t2.join()
+        t3 = threading.Thread(target=user1.market_maker,args=('BTC/USDT', 100, webhook_message,))
+        t3.start()
+        t3.join()
         return f"Trade successfully executed"
 
     except Exception as error:

@@ -1,5 +1,5 @@
 from .account import Account
-
+import asyncio
 
 class Strategy(Account):
     def __init__(self, account):
@@ -22,16 +22,16 @@ class Strategy(Account):
     def order(self, ticker, trade_type, direction, amount, price):
         try:
             if trade_type == "MARKET":
-                print(f'sending order on account: {self.name} - {ticker} - {trade_type} - {direction} - {amount} - {None}')
+                print(f'sending order on account: {ticker} - {trade_type} - {direction} - {amount} - {None}')
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, None)
                 return order_receipt
             elif trade_type == "LIMIT":
-                print(f'sending order on account: {self.name} - {ticker} - {trade_type} - {direction} - {amount} - {price}')
+                print(f'sending order on account: {ticker} - {trade_type} - {direction} - {amount} - {price}')
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, price)
                 return order_receipt
 
             if trade_type == "MARKET":
-                print(f'sending order on account: {self.name} - {ticker} - {trade_type} - {direction} - {amount} - {None}')
+                print(f'sending order on account: {ticker} - {trade_type} - {direction} - {amount} - {None}')
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, None)
                 return order_receipt
             elif trade_type == "LIMIT":
@@ -72,7 +72,6 @@ class Strategy(Account):
                             print(f'entry trade submitted: {entry_order_response}')
                             "sends an email of the executed trade"
                             # email.send_report(entry_order_response)
-
                         else:
                             insufficient_balance = "order not submitted, balance insufficient"
                             # email.send_report(insufficient_balance)
@@ -92,7 +91,6 @@ class Strategy(Account):
                             "prints response to the console"
                             print(f'entry trade submitted: {entry_order_response}')
                             "sends an email of the executed trade"
-
                     else:
                         insufficient_balance = "order not submitted, balance insufficient"
                         # email.send_report(insufficient_balance)
