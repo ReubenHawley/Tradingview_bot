@@ -74,17 +74,22 @@ def webhook():
         webhook_message = request.data
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
+        threads = []
         for symbol in SYMBOL_LIST:
-            t1 = threading.Thread(target=user2.market_maker, args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
-            t2 = threading.Thread(target=user3.market_maker,
-                        args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
+            t1 = threading.Thread(target=user2.market_maker,
+                                  args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
             t1.start()
+            threads.append(t1)
+            t2 = threading.Thread(target=user3.market_maker,
+                                  args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
             t2.start()
-            t1.join()
-            t2.join()
+
+            threads.append(t2)
         t3 = threading.Thread(target=user1.market_maker,args=('BTC/USDT', 100, webhook_message,))
         t3.start()
-        t3.join()
+        threads.append(t3)
+        for thread in threads:
+            thread.join()
         return f"Trade successfully executed"
 
     except Exception as error:
