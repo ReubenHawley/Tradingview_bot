@@ -9,15 +9,15 @@ from python.core.account import Account
 
 
 """ USER SETTINGS """
-user2_config = '../../config.txt'
+user2_config = '../config.txt'
 account2 = Account(user2_config)
 user2 = Strategy(account=account2)
 
-user1_config = '../../config_jeroen.txt'
+user1_config = '../config_jeroen.txt'
 account1 = Account(user1_config)
 user1 = Strategy(account=account1)
 
-user3_config = '../../config_reuben.txt'
+user3_config = '../config_reuben.txt'
 account3 = Account(user3_config)
 user3 = Strategy(account=account3)
 
