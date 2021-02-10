@@ -22,8 +22,9 @@ account3 = Account(user3_config)
 user3 = Strategy(account=account3)
 
 """TRADE PARAMETERS"""
-SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 100},
-               {"symbol": "BNB/USDT", "max_trades": 20}]
+SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 60},{"symbol": "ETH/USDT", "max_trades": 60},
+               {"symbol": "DOT/USDT", "max_trades": 20},{"symbol": "BNB/USDT", "max_trades": 40},
+               {"symbol": "OCEAN/USDT", "max_trades": 20},]
 
 # actual web server starts here #
 app = Flask(__name__)
@@ -73,9 +74,9 @@ def webhook():
         " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         for symbol in SYMBOL_LIST:
-            Thread(target=user2.market_maker, args=(symbol['symbol'], symbol['max_trades'], webhook_message,)).start()
-            Thread(target=user3.market_maker, args=(symbol['symbol'], symbol['max_trades'], webhook_message,)).start()
-        Thread(target=user1.market_maker, args=("BTC/USDT", 100, webhook_message,)).start()
+            user2.market_maker(symbol['symbol'], symbol['max_trades'], webhook_message)
+            user3.market_maker(symbol['symbol'], symbol['max_trades'], webhook_message)
+        user1.market_maker('BTC/USDT', 100, webhook_message)
         return f"Trade successfully executed"
 
     except Exception as error:
