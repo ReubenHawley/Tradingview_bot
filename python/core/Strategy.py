@@ -22,16 +22,16 @@ class Strategy(Account):
     def order(self, ticker, trade_type, direction, amount, price):
         try:
             if trade_type == "MARKET":
-                print(f'sending order: {ticker} - {trade_type} - {direction} - {amount} - {None}')
+                print(f'sending order on account: {self.name} - {ticker} - {trade_type} - {direction} - {amount} - {None}')
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, None)
                 return order_receipt
             elif trade_type == "LIMIT":
-                print(f'sending order: {ticker} - {trade_type} - {direction} - {amount} - {price}')
+                print(f'sending order on account: {self.name} - {ticker} - {trade_type} - {direction} - {amount} - {price}')
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, price)
                 return order_receipt
 
             if trade_type == "MARKET":
-                print(f'sending order: {ticker} - {trade_type} - {direction} - {amount} - {None}')
+                print(f'sending order on account: {self.name} - {ticker} - {trade_type} - {direction} - {amount} - {None}')
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, None)
                 return order_receipt
             elif trade_type == "LIMIT":
