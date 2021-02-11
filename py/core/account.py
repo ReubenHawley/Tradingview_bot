@@ -1,6 +1,6 @@
 import os
 import ccxt
-
+import pandas as pd
 
 class Account:
     def __init__(self, config="../../config.txt"):
@@ -14,6 +14,9 @@ class Account:
         self.exchange = ccxt.binance()
         self.exchange.apiKey = self.api_key
         self.exchange.secret = self.secret
+
+    def coins(self):
+        self.exchange.fetch_balance(params={})
 
     def outstanding_on_order(self, symbol='BTC/USDT'):
         open_orders = self.exchange.fetch_open_orders(symbol)
@@ -41,3 +44,14 @@ class Account:
     def available_balance(self):
         available_balance = round((self.exchange.fetch_free_balance()['USDT']), 2)
         return available_balance
+
+
+if __name__ == '__main__':
+    reuben = Account()
+    wallet = reuben.exchange.fetch_balance()
+    coins = wallet.pop('info')
+    df = pd.DataFrame(coins['balances'])
+    df['free'] = df['free'].astype(float)
+    df['locked'] = df['locked'].astype(float)
+    df = df.loc[(df['free'] > 0.000000)]
+    print(df)
