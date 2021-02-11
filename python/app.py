@@ -22,9 +22,11 @@ account3 = Account(user3_config)
 user3 = Strategy(account=account3)
 
 """TRADE PARAMETERS"""
-SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 60},{"symbol": "ETH/USDT", "max_trades": 60},
-               {"symbol": "DOT/USDT", "max_trades": 20},{"symbol": "BNB/USDT", "max_trades": 40},
-               {"symbol": "OCEAN/USDT", "max_trades": 20},]
+SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 60, 'premium': 1.02},
+               {"symbol": "ETH/USDT", "max_trades": 60, 'premium': 1.02},
+               {"symbol": "DOT/USDT", "max_trades": 20, 'premium': 1.02},
+               {"symbol": "BNB/USDT", "max_trades": 40, 'premium': 1.02},
+               {"symbol": "OCEAN/USDT", "max_trades": 20, 'premium': 1.02}]
 
 # actual web server starts here #
 app = Flask(__name__)
@@ -76,16 +78,23 @@ def webhook():
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         threads = []
         for symbol in SYMBOL_LIST:
-            t1 = threading.Thread(target=user2.market_maker,
-                                  args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
+            t1 = threading.Thread(target=user1.market_maker, args=(symbol['symbol'],
+                                                                   symbol['max_trades'],
+                                                                   symbol['premium'],
+                                                                   webhook_message,))
             t1.start()
             threads.append(t1)
-            t2 = threading.Thread(target=user3.market_maker,
-                                  args=(symbol['symbol'], symbol['max_trades'], webhook_message,))
+            t2 = threading.Thread(target=user1.market_maker, args=(symbol['symbol'],
+                                                                   symbol['max_trades'],
+                                                                   symbol['premium'],
+                                                                   webhook_message,))
             t2.start()
 
             threads.append(t2)
-        t3 = threading.Thread(target=user1.market_maker,args=('BTC/USDT', 100, webhook_message,))
+        t3 = threading.Thread(target=user1.market_maker, args=(SYMBOL_LIST[0]['symbol'],
+                                                               SYMBOL_LIST[0]['max_trades'],
+                                                               SYMBOL_LIST[0]['premium'],
+                                                               webhook_message,))
         t3.start()
         threads.append(t3)
         for thread in threads:
