@@ -1,5 +1,6 @@
 from .account import Account
-import asyncio
+from termcolor import colored
+
 
 class Strategy(Account):
     def __init__(self, account):
@@ -22,35 +23,36 @@ class Strategy(Account):
     def order(self, ticker, trade_type, direction, amount, price):
         try:
             if trade_type == "MARKET":
-                print(f'sending order on account: {ticker} - {trade_type} - {direction} - {amount} - {None}')
+                print(colored(f'sending order on account: '
+                              f'{ticker} - {trade_type} - {direction} - {amount} - {None}', 'blue'))
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, None)
                 return order_receipt
             elif trade_type == "LIMIT":
-                print(f'sending order on account: {ticker} - {trade_type} - {direction} - {amount} - {price}')
+                print(colored(f'sending order: '
+                              f'{ticker} - {trade_type} - {direction} - {amount} - {price}', 'blue'))
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, price)
                 return order_receipt
 
             if trade_type == "MARKET":
-                print(f'sending order on account: {ticker} - {trade_type} - {direction} - {amount} - {None}')
+                print(colored(f'sending order on account: '
+                              f'{ticker} - {trade_type} - {direction} - {amount} - {None}', 'blue'))
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, None)
                 return order_receipt
             elif trade_type == "LIMIT":
-                print(f'sending order: {ticker} - {trade_type} - {direction} - {amount} - {price}')
+                print(colored(f'sending order: {ticker} - {trade_type} - {direction} - {amount} - {price}', 'blue'))
                 order_receipt = self.account.create_order(ticker, trade_type, direction, amount, price)
                 return order_receipt
 
         except Exception as exception:
             print('type is:', exception.__class__.__name__)
 
-    def market_maker(self, trade_symbol, max_trades, webhook_message):
+    def market_maker(self, trade_symbol, max_trades, premium, webhook_message):
         webhook_message = webhook_message
         base = webhook_message['base']
         quote = webhook_message['quote']
         quantity = float(webhook_message['quantity'])
-        order_type = webhook_message['ordertype']
         side = webhook_message['side']
         symbol = f'{quote}/{base}'
-        price = webhook_message['price']
         position_type = webhook_message['position_type']
         amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
         "do a check to see if the trade is possible"
@@ -62,39 +64,27 @@ class Strategy(Account):
                                 self.account.fetch_free_balance()[base]:
                             "returns the response from the exchange, whether successful or not"
                             entry_order_response = self.order(ticker=symbol,
-                                                              trade_type=order_type,
-                                                              direction=side,
+                                                              trade_type="MARKET",
+                                                              direction="BUY",
                                                               amount=amount,
-                                                              price=price
+                                                              price=''
                                                               )
 
                             "prints response to the console"
-                            print(f'entry trade submitted: {entry_order_response}')
-                            "sends an email of the executed trade"
-                            # email.send_report(entry_order_response)
+                            print(colored(f'entry trade submitted: {entry_order_response}', 'green'))
+                            selling_price = entry_order_response['price']*premium
+                            if entry_order_response:
+                                exit_order_response = self.order(ticker=symbol,
+                                                                 trade_type="LIMIT",
+                                                                 direction="SELL",
+                                                                 amount=amount,
+                                                                 price=selling_price
+                                                                 )
+                                print(colored(f'entry trade submitted: {exit_order_response}', 'green'))
                         else:
-                            insufficient_balance = "order not submitted, balance insufficient"
-                            # email.send_report(insufficient_balance)
-                            print(insufficient_balance)
-
-                    elif side == "SELL":
-                        if amount < self.account.fetch_free_balance()[quote]:
-                            print(f"{symbol}-{order_type}-{side}-{quantity}-{price}")
-                            "returns the response from the exchange, whether successful or not"
-                            entry_order_response = self.order(ticker=symbol,
-                                                              trade_type=order_type,
-                                                              direction=side,
-                                                              amount=amount,
-                                                              price=price
-                                                              )
-
-                            "prints response to the console"
-                            print(f'entry trade submitted: {entry_order_response}')
-                            "sends an email of the executed trade"
+                            print(colored("order not submitted, balance insufficient", 'red'))
                     else:
-                        insufficient_balance = "order not submitted, balance insufficient"
-                        # email.send_report(insufficient_balance)
-                        print(insufficient_balance)
+                        print(colored("order not submitted, balance insufficient", 'red'))
                     return '200'
                 else:
                     print(f'order received for symbol:{symbol} but strategy is of symbol:{trade_symbol} ')
