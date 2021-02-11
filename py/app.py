@@ -4,10 +4,8 @@ from flask import Flask, request, render_template
 from ast import literal_eval
 from flask_ngrok import run_with_ngrok
 import threading
-import json
 from py.core.Strategy import Strategy
 from py.core.account import Account
-
 
 """ USER SETTINGS """
 user2_config = '../../config.txt'
@@ -34,28 +32,16 @@ app = Flask(__name__)
 run_with_ngrok(app)
 
 
-def evalfn(pairs):
-    res = {}
-    for key, val in pairs:
-        if val in {'true','false'}:
-            res[key] = val == 'true'
-            continue
-        try:
-            res[key] = literal_eval(val)
-        except Exception as e:
-            res[key] = val
-    return res
-
 @app.route('/')
 @app.route('/dashboard/')
 # visible dashboard which to view and interact
 def dashboard():
     trades = []
     for symbol in SYMBOL_LIST:
-      trades += user2.exchange.fetch_my_trades(symbol["symbol"])
-      trades.reverse()
+        trades += user2.exchange.fetch_my_trades(symbol["symbol"])
+        trades.reverse()
 
-    return render_template('Dashboard.html', trades=trades,     symbols=SYMBOL_LIST)
+    return render_template('Dashboard.html', trades=trades, symbols=SYMBOL_LIST)
 
 
 @app.route('/account')
@@ -72,12 +58,13 @@ def account():
 def orders():
     open_orders = []
     for symbol in SYMBOL_LIST:
-      open_orders += user3.exchange.fetch_open_orders(symbol['symbol'])
+        open_orders += user3.exchange.fetch_open_orders(symbol['symbol'])
     open_orders.reverse()
     btc = user3.exchange.fetch_ticker('BTC/USDT')['close']
     return render_template('orders.html',
                            open_orders=open_orders,
                            btc=btc)
+
 
 @app.route('/webhook', methods=['POST'])
 # webhook for receiving of orders
@@ -117,6 +104,7 @@ def webhook():
     except Exception as error:
         print('type is:', error.__class__.__name__)
         print_exc()
+
 
 if __name__ == '__main__':
     "instantiate the flask app in debug mode"
