@@ -6,17 +6,20 @@ from flask_ngrok import run_with_ngrok
 import threading
 from py.core.Strategy import Strategy
 from py.core.account import Account
+import os
+script_dir = os.path.abspath("..")
+
 
 """ USER SETTINGS """
-user2_config = '../../config.txt'
+user2_config = f'{script_dir}/config.txt'
 account2 = Account(user2_config)
 user2 = Strategy(account=account2)
 
-user1_config = '../../config_jeroen.txt'
+user1_config = f'{script_dir}/config_jeroen.txt'
 account1 = Account(user1_config)
 user1 = Strategy(account=account1)
 
-user3_config = '../../config_reuben.txt'
+user3_config = f'{script_dir}/config_reuben.txt'
 account3 = Account(user3_config)
 user3 = Strategy(account=account3)
 
@@ -72,7 +75,6 @@ def webhook():
     try:
         " capture the webhook through a listener into a variable called webhook_message"
         webhook_message = request.data
-        print(webhook_message)
         # " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         trade_parameters = list(webhook_message.values())
@@ -87,14 +89,14 @@ def webhook():
             t2 = threading.Thread(target=user1.market_maker, args=(symbol['symbol'],
                                                                    symbol['max_trades'],
                                                                    symbol['premium'],
-                                                                   webhook_message,))
+                                                                   trade_parameters,))
             t2.start()
 
             threads.append(t2)
         t3 = threading.Thread(target=user1.market_maker, args=(SYMBOL_LIST[0]['symbol'],
                                                                SYMBOL_LIST[0]['max_trades'],
                                                                SYMBOL_LIST[0]['premium'],
-                                                               webhook_message,))
+                                                               trade_parameters,))
         t3.start()
         threads.append(t3)
         for thread in threads:
