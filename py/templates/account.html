@@ -15,7 +15,14 @@
     <!-- Custom styles for this template -->
     <link href=".../../static/css/dashboard.css" rel="stylesheet">
     <style>
-
+.holdings{
+  float: left;
+  width: 25%;
+  padding: 15px;
+  background:#ffcc00;
+  border-radius:25px;
+  color:black;
+}
 .column {
   float: left;
   width: 30%;
@@ -77,6 +84,14 @@
                 <div class="column">ACCOUNT TOTAL IN USDT: {{total_usdt_value}}</div>
             </div>
           </div>
+          {% for coin in coins %}
+          <div class="row">
+            <div class="holdings">COIN: coin.name</div>
+            <div class="holdings">COIN: coin.amount</div>
+            <div class="holdings">USDT: coin.value</div>
+            <div class="holdings">BTC: coin.btc</div>
+          </div>
+          {% endfor%}
         </main>
       </div>
     </div>

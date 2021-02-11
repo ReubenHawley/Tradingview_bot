@@ -115,7 +115,7 @@ Ensure you have Python 3.7 or higher installed
 This is an example of how to list things you need to use the software and how to install them.
 * pip
   ```sh
-  python get-pip.py
+  py get-pip.py
   ```
 
 ### Installation
