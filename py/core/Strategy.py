@@ -46,7 +46,7 @@ class Strategy(Account):
         except Exception as exception:
             print('type is:', exception.__class__.__name__)
 
-    def market_maker(self, trade_symbol, max_trades, premium, trade_parameters):
+    def market_maker(self, trade_symbol, max_trades, premium, min_trade_size, trade_parameters):
         base = trade_parameters[0]
         quote = trade_parameters[1]
         quantity = float(trade_parameters[2])
@@ -60,8 +60,7 @@ class Strategy(Account):
                 if len(self.exchange.fetch_open_orders(trade_symbol)) < max_trades:
                     if symbol == trade_symbol:
                         if side == "BUY":
-                            if float(amount) * self.account.fetch_ticker(symbol)['close'] < \
-                                    self.account.fetch_free_balance()[base]:
+                            if float(amount) * self.account.fetch_ticker(symbol)['close'] > min_trade_size:
                                 "returns the response from the exchange, whether successful or not"
                                 entry_order_response = self.exchange.create_market_buy_order(symbol, amount=amount)
 

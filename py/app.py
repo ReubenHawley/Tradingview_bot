@@ -24,11 +24,11 @@ account3 = Account(user3_config)
 user3 = Strategy(account=account3)
 
 """TRADE PARAMETERS"""
-SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 60, 'premium': 1.02},
-               {"symbol": "ETH/USDT", "max_trades": 60, 'premium': 1.02},
-               {"symbol": "DOT/USDT", "max_trades": 20, 'premium': 1.02},
-               {"symbol": "BNB/USDT", "max_trades": 40, 'premium': 1.02},
-               {"symbol": "OCEAN/USDT", "max_trades": 20, 'premium': 1.02}]
+SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 60, 'premium': 1.02, 'minimum_trade_size': 10},
+               {"symbol": "ETH/USDT", "max_trades": 60, 'premium': 1.02, 'minimum_trade_size': 10},
+               {"symbol": "DOT/USDT", "max_trades": 20, 'premium': 1.02, 'minimum_trade_size': 10},
+               {"symbol": "BNB/USDT", "max_trades": 40, 'premium': 1.02, 'minimum_trade_size': 10},
+               {"symbol": "OCEAN/USDT", "max_trades": 20, 'premium': 1.02, 'minimum_trade_size': 10}]
 
 # actual web server starts here #
 app = Flask(__name__)
@@ -83,12 +83,14 @@ def webhook():
             t1 = threading.Thread(target=user2.market_maker, args=(symbol['symbol'],
                                                                    symbol['max_trades'],
                                                                    symbol['premium'],
+                                                                   symbol['minimum_trade_size'],
                                                                    trade_parameters,))
             t1.start()
             threads.append(t1)
             t2 = threading.Thread(target=user1.market_maker, args=(symbol['symbol'],
                                                                    symbol['max_trades'],
                                                                    symbol['premium'],
+                                                                   symbol['minimum_trade_size'],
                                                                    trade_parameters,))
             t2.start()
 
@@ -96,6 +98,7 @@ def webhook():
         t3 = threading.Thread(target=user1.market_maker, args=(SYMBOL_LIST[0]['symbol'],
                                                                SYMBOL_LIST[0]['max_trades'],
                                                                SYMBOL_LIST[0]['premium'],
+                                                               SYMBOL_LIST[0]['minimum_trade_size'],
                                                                trade_parameters,))
         t3.start()
         threads.append(t3)
