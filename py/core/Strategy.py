@@ -60,20 +60,21 @@ class Strategy(Account):
                 if len(self.exchange.fetch_open_orders(trade_symbol)) < max_trades:
                     if symbol == trade_symbol:
                         if side == "BUY":
-                            if float(amount) * self.account.fetch_ticker(symbol)['close'] > min_trade_size:
-                                "returns the response from the exchange, whether successful or not"
-                                entry_order_response = self.exchange.create_market_buy_order(symbol, amount=amount)
+                            if float(amount) * self.account.fetch_ticker(symbol)['close'] > self.account.fetch_free_balance()[base]:
+                                if float(amount) * self.account.fetch_ticker(symbol)['close'] > min_trade_size:
+                                    "returns the response from the exchange, whether successful or not"
+                                    entry_order_response = self.exchange.create_market_buy_order(symbol, amount=amount)
 
-                                "prints response to the console"
-                                print(colored(f'entry trade submitted: {entry_order_response}', 'green'))
-                                selling_price = entry_order_response['price']*premium
-                                if entry_order_response:
-                                    exit_order_response = self.exchange.create_limit_buy_order(symbol,
-                                                                                               entry_order_response['amount'],
-                                                                                               selling_price)
-                                    print(colored(f'entry trade submitted: {exit_order_response}', 'green'))
-                            else:
-                                print(colored("order not submitted, balance insufficient", 'red'))
+                                    "prints response to the console"
+                                    print(colored(f'entry trade submitted: {entry_order_response}', 'green'))
+                                    selling_price = entry_order_response['price']*premium
+                                    if entry_order_response:
+                                        exit_order_response = self.exchange.create_limit_buy_order(symbol,
+                                                                                                   entry_order_response['amount'],
+                                                                                                   selling_price)
+                                        print(colored(f'entry trade submitted: {exit_order_response}', 'green'))
+                                else:
+                                    print(colored("order not submitted, balance insufficient", 'red'))
                         else:
                             print(colored("order not submitted, balance insufficient", 'red'))
                         return '200'
