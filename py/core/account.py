@@ -15,8 +15,14 @@ class Account:
         self.exchange.apiKey = self.api_key
         self.exchange.secret = self.secret
 
-    def coins(self):
-        self.exchange.fetch_balance(params={})
+    def account_holdings(self):
+        wallet_holdings = self.exchange.fetch_balance()
+        coins = wallet_holdings.pop('info')
+        df = pd.DataFrame(coins['balances'])
+        df['free'] = df['free'].astype(float)
+        df['locked'] = df['locked'].astype(float)
+        df = df.loc[(df['free'] > 0.000000)]
+        return df.to_html(classes='coin_holdings')
 
     def outstanding_on_order(self, symbol='BTC/USDT'):
         open_orders = self.exchange.fetch_open_orders(symbol)

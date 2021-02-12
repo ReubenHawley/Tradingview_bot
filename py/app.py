@@ -39,12 +39,7 @@ run_with_ngrok(app)
 @app.route('/dashboard/')
 # visible dashboard which to view and interact
 def dashboard():
-    trades = []
-    for symbol in SYMBOL_LIST:
-        trades += user2.exchange.fetch_my_trades(symbol["symbol"])
-        trades.reverse()
-
-    return render_template('Dashboard.html', trades=trades, symbols=SYMBOL_LIST)
+    return render_template('dashboard.html',)
 
 
 @app.route('/account')
@@ -54,8 +49,19 @@ def account():
                            usdt_balance=user3.available_balance(),
                            btc_holdings=user3.btc_holdings(),
                            total_usdt_value=user3.account_value(),
+                           coins=user3.account_holdings(),
                            )
 
+
+@app.route('/trade_history')
+# visible dashboard which to view and interact
+def trade_history():
+    trades = []
+    for symbol in SYMBOL_LIST:
+        trades += user2.exchange.fetch_my_trades(symbol["symbol"])
+        trades.reverse()
+
+    return render_template('trade_history.html', trades=trades, symbols=SYMBOL_LIST)
 
 @app.route('/orders')
 def orders():
