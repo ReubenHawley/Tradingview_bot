@@ -84,14 +84,16 @@ def webhook():
                                                                    symbol['max_trades'],
                                                                    symbol['premium'],
                                                                    symbol['minimum_trade_size'],
-                                                                   trade_parameters,))
+                                                                   trade_parameters,
+                                                                   'chris',))
             t1.start()
             threads.append(t1)
-            t2 = threading.Thread(target=user1.market_maker, args=(symbol['symbol'],
+            t2 = threading.Thread(target=user3.market_maker, args=(symbol['symbol'],
                                                                    symbol['max_trades'],
                                                                    symbol['premium'],
                                                                    symbol['minimum_trade_size'],
-                                                                   trade_parameters,))
+                                                                   trade_parameters,
+                                                                   'willem',))
             t2.start()
 
             threads.append(t2)
@@ -99,7 +101,8 @@ def webhook():
                                                                SYMBOL_LIST[0]['max_trades'],
                                                                SYMBOL_LIST[0]['premium'],
                                                                SYMBOL_LIST[0]['minimum_trade_size'],
-                                                               trade_parameters,))
+                                                               trade_parameters,
+                                                               'jeroen',))
         t3.start()
         threads.append(t3)
         for thread in threads:

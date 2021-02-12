@@ -46,7 +46,7 @@ class Strategy(Account):
         except Exception as exception:
             print('type is:', exception.__class__.__name__)
 
-    def market_maker(self, trade_symbol, max_trades, premium, min_trade_size, trade_parameters):
+    def market_maker(self, trade_symbol, max_trades, premium, min_trade_size, trade_parameters,name):
         base = trade_parameters[0]
         quote = trade_parameters[1]
         quantity = float(trade_parameters[2])
@@ -66,27 +66,27 @@ class Strategy(Account):
                                     entry_order_response = self.exchange.create_market_buy_order(symbol, amount=amount)
 
                                     "prints response to the console"
-                                    print(colored(f'entry trade submitted: {entry_order_response}', 'green'))
+                                    print(colored(f'entry trade submitted for {name}: {entry_order_response}', 'green'))
                                     selling_price = entry_order_response['price']*premium
                                     if entry_order_response:
                                         exit_order_response = self.exchange.create_limit_buy_order(symbol,
                                                                                                    entry_order_response['amount'],
                                                                                                    selling_price)
-                                        print(colored(f'entry trade submitted: {exit_order_response}', 'green'))
+                                        print(colored(f'entry trade submitted for {name}: {exit_order_response}', 'green'))
                                 else:
-                                    print(colored("order not submitted, balance insufficient", 'red'))
+                                    print(colored(f"order not submitted, balance insufficient on {name}s account", 'red'))
                         else:
-                            print(colored("order not submitted, balance insufficient", 'red'))
+                            print(colored(f"order not submitted for {name}, balance insufficient", 'red'))
                         return '200'
                     else:
-                        print(f'order received for symbol:{symbol} but strategy is of symbol:{trade_symbol} ')
+                        print(f'order received for {name} on symbol:{symbol} but strategy is of symbol:{trade_symbol} ')
                 else:
-                    print(f'{max_trades} open trades allowed, current open trades: '
+                    print(f'{max_trades} open trades allowed, current open trades for {name}: '
                           f'{len(self.exchange.fetch_open_orders(trade_symbol))}')
             else:
                 return "None type received, catching error"
         except Exception as e:
-            print('Failed to create order with', self.exchange.id, type(e).__name__, str(e))
+            print(f'Failed to create order for {name} with', self.exchange.id, type(e).__name__, str(e))
 
     def __str__(self):
         return f"Strategy for user:{self.user}"
