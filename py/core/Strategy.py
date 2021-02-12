@@ -69,7 +69,7 @@ class Strategy(Account):
                                     print(colored(f'entry trade submitted for {name}: {entry_order_response}', 'green'))
                                     selling_price = entry_order_response['price']*premium
                                     if entry_order_response:
-                                        exit_order_response = self.exchange.create_limit_buy_order(symbol,
+                                        exit_order_response = self.exchange.create_limit_sell_order(symbol,
                                                                                                    entry_order_response['amount'],
                                                                                                    selling_price)
                                         print(colored(f'entry trade submitted for {name}: {exit_order_response}', 'green'))

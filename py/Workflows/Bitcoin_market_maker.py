@@ -36,22 +36,19 @@ def start_strategy(symbol, time_to_sleep):
                 place_trade(symbol, time_to_sleep)
             elif 11 <= len(reuben.exchange.fetch_open_orders(symbol['symbol'])) <= 20:
                 print(f"current trades:{len(reuben.exchange.fetch_open_orders(symbol['symbol']))}/{symbol['max_trades']} open")
-                place_trade(symbol, time_to_sleep*30)
+                place_trade(symbol, time_to_sleep*60)
             elif 21 <= len(reuben.exchange.fetch_open_orders(symbol['symbol'])) <= 30:
                 print(
                     f"current trades:{len(reuben.exchange.fetch_open_orders(symbol['symbol']))}/{symbol['max_trades']} open")
-                place_trade(symbol, time_to_sleep * 60)
+                place_trade(symbol, time_to_sleep * 120)
             else:
                 print(
                     f"current trades:{len(reuben.exchange.fetch_open_orders(symbol['symbol']))}/{symbol['max_trades']} open")
-                place_trade(symbol, time_to_sleep * 90)
+                place_trade(symbol, time_to_sleep * 240)
 
 if __name__ == '__main__':
     sleepytime = 5
-    SYMBOL_LIST = [{"symbol": "SXP/USDT", "max_trades": 40, 'trade_size': 20, 'premium': 1.005},
-                   {"symbol": "UNFI/USDT", "max_trades": 20, 'trade_size': 4, 'premium': 1.005},
-                   {"symbol": "CRV/USDT", "max_trades": 40, 'trade_size': 20, 'premium': 1.005},
-                   {"symbol": "SUSHI/USDT", "max_trades": 20, 'trade_size': 4, 'premium': 1.005}
+    SYMBOL_LIST = [{"symbol": "BNB/USDT", "max_trades": 20, 'trade_size': 2, 'premium': 1.006},
                    ]
     threadlist = []
     for trade_symbol in SYMBOL_LIST:
