@@ -4,7 +4,6 @@ from flask import Flask, request, render_template
 from ast import literal_eval
 from flask_ngrok import run_with_ngrok
 import threading
-from py.core.Strategy import Strategy
 from py.core.account import Account
 import os
 script_dir = os.path.abspath("..")
@@ -12,16 +11,14 @@ script_dir = os.path.abspath("..")
 
 """ USER SETTINGS """
 user2_config = f'{script_dir}/config.txt'
-account2 = Account(user2_config)
-user2 = Strategy(account=account2)
+user2 = Account(user2_config)
 
 user1_config = f'{script_dir}/config_jeroen.txt'
-account1 = Account(user1_config)
-user1 = Strategy(account=account1)
+user1 = Account(user1_config)
 
 user3_config = f'{script_dir}/config_reuben.txt'
-account3 = Account(user3_config)
-user3 = Strategy(account=account3)
+user3 = Account(user3_config)
+
 
 """TRADE PARAMETERS"""
 SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 60, 'premium': 1.02, 'minimum_trade_size': 10},
@@ -62,6 +59,7 @@ def trade_history():
         trades.reverse()
 
     return render_template('trade_history.html', trades=trades, symbols=SYMBOL_LIST)
+
 
 @app.route('/orders')
 def orders():
