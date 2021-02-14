@@ -2,10 +2,12 @@ import os
 import ccxt
 import pandas as pd
 from termcolor import colored
+from py.core.dashboard import Portfolio
 
 
 class Account:
-    def __init__(self, config):
+    def __init__(self, name, config):
+        self.name = name
         """Instantiate email client"""
         """ open the config file to retrieve the apikey and secret 
         instantiate Auto bot"""
@@ -16,6 +18,8 @@ class Account:
         self.exchange = ccxt.binance()
         self.exchange.apiKey = self.api_key
         self.exchange.secret = self.secret
+        "instantiate portfolio"
+        self.account = Portfolio(self.exchange)
 
     def account_holdings(self):
         wallet_holdings = self.exchange.fetch_balance()
@@ -91,7 +95,7 @@ class Account:
         except Exception as exception:
             print('type is:', exception.__class__.__name__)
 
-    def market_maker(self, trade_symbol, max_trades, premium, min_trade_size, trade_parameters, name):
+    def market_maker(self, trade_symbol, max_trades, premium, min_trade_size, trade_parameters):
         base = trade_parameters[0]
         quote = trade_parameters[1]
         quantity = float(trade_parameters[2])
@@ -110,9 +114,16 @@ class Account:
                                     "returns the response from the exchange, whether successful or not"
                                     entry_order_response = self.exchange.create_market_buy_order(symbol,
                                                                                                  amount=amount)
-
-                                    "prints response to the console"
-                                    print(colored(f'entry trade submitted for {name}: {entry_order_response}',
+                                    trade_data = [entry_order_response['timestamp'],
+                                                  entry_order_response['symbol'],
+                                                  entry_order_response['side'],
+                                                  entry_order_response['price'],
+                                                  entry_order_response['amount'],
+                                                  entry_order_response['cost'],
+                                                  entry_order_response['fee']['cost']
+                                                  ]
+                                    self.account.add_to_csv(trade_data)
+                                    print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
                                                   'green'))
                                     selling_price = entry_order_response['price'] * premium
                                     if entry_order_response:
@@ -120,25 +131,25 @@ class Account:
                                                                                                     entry_order_response[
                                                                                                         'amount'],
                                                                                                     selling_price)
-                                        print(colored(f'entry trade submitted for {name}: {exit_order_response}',
+                                        print(colored(f'entry trade submitted for {self.name}: {exit_order_response}',
                                                       'green'))
                                 else:
-                                    print(colored(f"order not submitted, balance insufficient on {name}s account",
+                                    print(colored(f"order not submitted, balance insufficient on {self.name}s account",
                                                   'red'))
                         else:
-                            print(colored(f"order not submitted for {name}, balance insufficient", 'red'))
+                            print(colored(f"order not submitted for {self.name}, balance insufficient", 'red'))
                         return '200'
                     else:
                         print(
-                            f'order received for {name} on symbol:{symbol} but strategy is of symbol:{trade_symbol} ')
+                            f'order received for {self.name} on symbol:{symbol} but strategy is of symbol:{trade_symbol} ')
                 else:
-                    print(f'{max_trades} open trades allowed, current open trades for {name}: '
+                    print(f'{max_trades} open trades allowed, current open trades for {self.name}: '
                           f'{len(self.exchange.fetch_open_orders(trade_symbol))}')
             else:
                 return "None type received, catching error"
         except Exception as e:
-            print(f'Failed to create order for {name} with', self.exchange.id, type(e).__name__, str(e))
+            print(f'Failed to create order for {self.name} with', self.exchange.id, type(e).__name__, str(e))
 
     def __str__(self):
-        return f"Strategy for user:{self.exchange}"
+        return f"Strategy for {self.name} on exchange: {self.exchange}"
     # takes a strategy as an input and a webhook message for order routing
