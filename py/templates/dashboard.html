@@ -98,16 +98,28 @@ table.dataframe, .dataframe th, .dataframe td {
                 <div class="column">ACCOUNT TOTAL IN USDT: {{total_usdt_value}}</div>
             </div>
           </div>
-          <div>
+          <div class="dashboard-oversight">
+            <div class="account-details">
             <label>
               todays pnl:
             </label>
             </div>
-          <div>
+          <div class="account-details">
             <label>
               todays total trade volume:
             </label>
           </div>
+          </div>
+          {% for symbol in symbols %}
+          <hr>
+              <div class="coin-info">
+                <h5>{{symbol.symbol}}</h5>
+                <div>open trades/total trades:{{symbol.max_trades}} </div>
+                <div>drawdown:</div>
+                <div>total holdings:</div>
+                <div>total value:</div>
+              </div>
+          {% endfor %}
         </main>
       </div>
     </div>

@@ -11,13 +11,14 @@ script_dir = os.path.abspath("..")
 
 """ USER SETTINGS """
 user2_config = f'{script_dir}/config.txt'
-user2 = Account(user2_config)
+user2 = Account(name='chris', config=user2_config)
+
 
 user1_config = f'{script_dir}/config_jeroen.txt'
-user1 = Account(user1_config)
+user1 = Account(name='jeroen', config=user1_config)
 
 user3_config = f'{script_dir}/config_reuben.txt'
-user3 = Account(user3_config)
+user3 = Account(name='Willem', config=user3_config)
 
 
 """TRADE PARAMETERS"""
@@ -36,7 +37,7 @@ run_with_ngrok(app)
 @app.route('/dashboard/')
 # visible dashboard which to view and interact
 def dashboard():
-    return render_template('dashboard.html',)
+    return render_template('dashboard.html', symbols=SYMBOL_LIST)
 
 
 @app.route('/account')
@@ -88,16 +89,14 @@ def webhook():
                                                                    symbol['max_trades'],
                                                                    symbol['premium'],
                                                                    symbol['minimum_trade_size'],
-                                                                   trade_parameters,
-                                                                   'chris',))
+                                                                   trade_parameters,))
             t1.start()
             threads.append(t1)
             t2 = threading.Thread(target=user3.market_maker, args=(symbol['symbol'],
                                                                    symbol['max_trades'],
                                                                    symbol['premium'],
                                                                    symbol['minimum_trade_size'],
-                                                                   trade_parameters,
-                                                                   'willem',))
+                                                                   trade_parameters,))
             t2.start()
 
             threads.append(t2)
@@ -105,8 +104,7 @@ def webhook():
                                                                SYMBOL_LIST[0]['max_trades'],
                                                                SYMBOL_LIST[0]['premium'],
                                                                SYMBOL_LIST[0]['minimum_trade_size'],
-                                                               trade_parameters,
-                                                               'jeroen',))
+                                                               trade_parameters,))
         t3.start()
         threads.append(t3)
         for thread in threads:

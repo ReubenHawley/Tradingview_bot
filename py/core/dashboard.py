@@ -1,7 +1,6 @@
 import os
 import csv
 
-
 class Portfolio:
     def __init__(self, account):
         self.account = account
@@ -61,7 +60,3 @@ class Portfolio:
             limit = None  # change for your limit
             closed_orders = self.account.exchange.fetch_trades(symbol, since, limit)
             return closed_orders
-
-if __name__ == '__main__':
-    entry_order_response = {'info': {'symbol': 'ETHUSDT', 'orderId': 3010491841, 'orderListId': -1, 'clientOrderId': 'QkBryfgKSTg2saUhGDeNtm', 'transactTime': 1613328602642, 'price': '0.00000000', 'origQty': '0.01232000', 'executedQty': '0.01232000', 'cummulativeQuoteQty': '22.24018720', 'status': 'FILLED', 'timeInForce': 'GTC', 'type': 'MARKET', 'side': 'BUY', 'fills': [{'price': '1805.21000000', 'qty': '0.01232000', 'commission': '0.00012549', 'commissionAsset': 'BNB', 'tradeId': 295609302}]}, 'id': '3010491841', 'clientOrderId': 'QkBryfgKSTg2saUhGDeNtm', 'timestamp': 1613328602642, 'datetime': '2021-02-14T18:50:02.642Z', 'lastTradeTimestamp': None, 'symbol': 'ETH/USDT', 'type': 'market', 'side': 'buy', 'price': 1805.2100000000003, 'amount': 0.01232, 'cost': 22.240187199999998, 'average': 1805.2099999999998, 'filled': 0.01232, 'remaining': 0.0, 'status': 'closed', 'fee': {'cost': 0.00012549, 'currency': 'BNB'}, 'trades': [{'info': {'price': '1805.21000000', 'qty': '0.01232000', 'commission': '0.00012549', 'commissionAsset': 'BNB', 'tradeId': 295609302}, 'timestamp': None, 'datetime': None, 'symbol': 'ETH/USDT', 'id': None, 'order': None, 'type': None, 'side': None, 'takerOrMaker': None, 'price': 1805.21, 'amount': 0.01232, 'cost': 22.240187199999998, 'fee': {'cost': 0.00012549, 'currency': 'BNB'}}]}
-    print(entry_order_response['fee']['cost'])
