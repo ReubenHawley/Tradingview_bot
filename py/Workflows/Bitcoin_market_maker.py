@@ -7,7 +7,7 @@ import threading
 class MM:
     """"instantiate account"""
     def __init__(self, account):
-        self.account = account()
+        self.account = account
 
     def place_trade(self, symbol, sleeptime):
         entry_order_response = self.account.order(symbol['symbol'], 'MARKET', "BUY", symbol['trade_size'], '')
@@ -51,11 +51,13 @@ class MM:
 
 if __name__ == '__main__':
     sleepytime = 5
-    SYMBOL_LIST = [{"symbol": "BNB/USDT", "max_trades": 20, 'trade_size': 2, 'premium': 1.006},
+    SYMBOL_LIST = [{"symbol": "BNB/USDT", "max_trades": 20, 'trade_size': 2, 'premium': 1.003},
                    ]
     threadlist = []
+    user1 = Account(name='chris', config='../../config.txt')
+    market_maker = MM(user1)
     for trade_symbol in SYMBOL_LIST:
-        t1 = threading.Thread(target=start_strategy, args=(trade_symbol, sleepytime,))
+        t1 = threading.Thread(target=market_maker.start_strategy, args=(trade_symbol, sleepytime,))
         t1.start()
         threadlist.append(t1)
     for thread in threadlist:

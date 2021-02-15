@@ -6,7 +6,7 @@ class Portfolio:
         self.account = account
         self.columns = ['timestamp', 'symbol', 'direction', 'price', 'amount', 'cost', 'fees']
         self.main_dir = os.path.abspath("..")
-        self.trade_data_path = 'trade_data/executed_trades.csv'
+        self.trade_data_path = f'trade_data/{self.account.name}executed_trades.csv'
         self.final_path = os.path.join(self.main_dir, self.trade_data_path)
         self.create_csv()
 
