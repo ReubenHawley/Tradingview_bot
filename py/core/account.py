@@ -123,7 +123,7 @@ class Account:
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
+        amount = self.order_amount(symbol=symbol, position_type=position_type)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters is not None:
