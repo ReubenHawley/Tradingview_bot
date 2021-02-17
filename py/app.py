@@ -22,12 +22,11 @@ user3 = Account(name='Willem', config=user3_config)
 
 
 """TRADE PARAMETERS"""
-SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 120, 'premium': 1.005, 'minimum_trade_size': 10},
-               {"symbol": "ETH/USDT", "max_trades": 120, 'premium': 1.005, 'minimum_trade_size': 10},
-                {"symbol": "BNB/USDT", "max_trades": 80, 'premium': 1.005, 'minimum_trade_size': 10},
-               {"symbol": "DOT/USDT", "max_trades": 40, 'premium': 1.005, 'minimum_trade_size': 10},
-                {"symbol": "CRV/USDT", "max_trades": 40, 'premium': 1.005, 'minimum_trade_size': 10},
-               {"symbol": "OCEAN/USDT", "max_trades": 40, 'premium': 1.005, 'minimum_trade_size': 10}]
+SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 120, 'premium': 1.003, 'minimum_trade_size': 10},
+               {"symbol": "ETH/USDT", "max_trades": 120, 'premium': 1.003, 'minimum_trade_size': 10},
+               {"symbol": "DOT/USDT", "max_trades": 40, 'premium': 1.003, 'minimum_trade_size': 10},
+                {"symbol": "CRV/USDT", "max_trades": 40, 'premium': 1.003, 'minimum_trade_size': 10},
+               {"symbol": "OCEAN/USDT", "max_trades": 40, 'premium': 1.003, 'minimum_trade_size': 10}]
 
 # actual web server starts here #
 app = Flask(__name__)
