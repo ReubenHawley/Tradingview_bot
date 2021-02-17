@@ -57,35 +57,14 @@ class Account:
         available_balance = round((self.exchange.fetch_free_balance()['USDT']), 2)
         return available_balance
 
-    def order_amount(self, symbol, position_type):
+    def order_amount(self, symbol, amount, position_type):
         try:
-            free_balance = self.exchange.fetch_free_balance()['USDT']
-            open_orders = self.exchange.fetch_open_orders(symbol)
-            count = len(open_orders)
-            base_percentage = 0.5
             if position_type == 'relative':
-                if count < 10:
-                    position_size = (free_balance / 100) * base_percentage
-                if 10 <= count < 20:
-                    base_percentage += 0.1
-                    position_size = (free_balance / 100) * base_percentage
-                if 20 <= count < 30:
-                    base_percentage += 0.2
-                    position_size = (free_balance / 100) * base_percentage
-                if 30 <= count < 40:
-                    base_percentage += 0.25
-                    position_size = (free_balance / 100) * base_percentage
-                if 40 <= count < 50:
-                    base_percentage += 0.35
-                    position_size = (free_balance / 100) * base_percentage
-                if 50 <= count < 60:
-                    base_percentage += 0.5
-                    position_size = (free_balance / 100) * base_percentage
-                else:
-                    position_size = free_balance / 100
-                return position_size
+                usdt_amount = (self.exchange.fetch_free_balance()['USDT'] / 100) * amount
+                positional_amount = float(usdt_amount / self.exchange.fetch_ticker(symbol)['close'])
+                return positional_amount
             elif position_type == 'absolute':
-                positional_amount = float(free_balance/100)
+                positional_amount = float(amount)
                 return positional_amount
         except TypeError:
             return "wrong value type received, check payload parameters"
@@ -123,7 +102,7 @@ class Account:
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = self.order_amount(symbol=symbol, position_type=position_type)
+        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters is not None:
@@ -154,6 +133,7 @@ class Account:
                                                                                                     selling_price)
                                         print(colored(f'entry trade submitted for {self.name}: {exit_order_response}',
                                                       'green'))
+                                        return '200'
                                 else:
                                     print(colored(f"order not submitted, balance insufficient on {self.name}s account",
                                                   'red'))
@@ -162,7 +142,7 @@ class Account:
                         return '200'
                     else:
                         print(
-                            f'order received for {self.name} on symbol:{symbol} but strategy is of symbol:{trade_symbol} ')
+                            f'order received for {self.name} on symbol:{symbol} but strategy is of symbol:{trade_symbol}')
                 else:
                     print(f'{max_trades} open trades allowed, current open trades for {self.name}: '
                           f'{len(self.exchange.fetch_open_orders(trade_symbol))}')
@@ -171,10 +151,85 @@ class Account:
         except Exception as e:
             print(f'Failed to create order for {self.name} with', self.exchange.id, type(e).__name__, str(e))
 
+    def grid_trader(self, trade_symbol, max_trades, trade_parameters):
+        premium = 1.01
+        min_trade_size: float = 10
+        base = trade_parameters[0]
+        quote = trade_parameters[1]
+        symbol = f'{quote}/{base}'
+        position_type = trade_parameters[6]
+        amount = round(self.order_amount(symbol=symbol, position_type=position_type), 2)
+        print(amount)
+        "do a check to see if the trade is possible"
+        try:
+            if trade_parameters is not None:
+                if len(self.exchange.fetch_open_orders(trade_symbol)) == 0:
+                    if float(amount) * self.exchange.fetch_ticker(symbol)['close'] > min_trade_size:
+                        "returns the response from the exchange, whether successful or not"
+                        entry_order_response = self.exchange.create_market_buy_order(symbol,
+                                                                                     amount=amount)
+                        trade_data = [entry_order_response['timestamp'],
+                                      entry_order_response['symbol'],
+                                      entry_order_response['side'],
+                                      entry_order_response['price'],
+                                      entry_order_response['amount'],
+                                      entry_order_response['cost'],
+                                      entry_order_response['fee']['cost']
+                                      ]
+                        self.account.add_to_csv(trade_data)
+                        print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
+                                      'green'))
+                        selling_price = entry_order_response['price'] * premium
+                        if entry_order_response:
+                            exit_order_response = self.exchange.create_limit_sell_order(symbol,
+                                                                                        entry_order_response[
+                                                                                            'amount'],
+                                                                                        selling_price)
+                            print(colored(f'entry trade submitted for {self.name}: {exit_order_response}',
+                                          'green'))
+                    else:
+                        print(colored(f"order not submitted, balance insufficient on {self.name}s account",
+                                      'red'))
+                    if len(self.exchange.fetch_open_orders(trade_symbol)) < max_trades:
+                        if symbol == trade_symbol:
+                            if self.exchange.fetch_free_balance()[base] > min_trade_size:
+                                if float(amount) * self.exchange.fetch_ticker(symbol)['close'] > min_trade_size:
+                                    "returns the response from the exchange, whether successful or not"
+                                    entry_order_response = self.exchange.create_market_buy_order(symbol,
+                                                                                                 amount=amount)
+                                    trade_data = [entry_order_response['timestamp'],
+                                                  entry_order_response['symbol'],
+                                                  entry_order_response['side'],
+                                                  entry_order_response['price'],
+                                                  entry_order_response['amount'],
+                                                  entry_order_response['cost'],
+                                                  entry_order_response['fee']['cost']
+                                                  ]
+                                    self.account.add_to_csv(trade_data)
+                                    print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
+                                                  'green'))
+                                    selling_price = entry_order_response['price'] * premium
+                                    if entry_order_response:
+                                        exit_order_response = self.exchange.create_limit_sell_order(symbol,
+                                                                                                    entry_order_response[
+                                                                                                        'amount'],
+                                                                                                    selling_price)
+                                        print(colored(f'entry trade submitted for {self.name}: {exit_order_response}',
+                                                      'green'))
+                                else:
+                                    print(colored(f"order not submitted, balance insufficient on {self.name}s account",
+                                                  'red'))
+                            else:
+                                print(colored(f"order not submitted for {self.name}, balance insufficient", 'red'))
+                            return '200'
+                    else:
+                        print(f'{max_trades} open trades allowed, current open trades for {self.name}: '
+                              f'{len(self.exchange.fetch_open_orders(trade_symbol))}')
+                else:
+                    return "None type received, catching error"
+        except Exception as e:
+            print(f'Failed to create order for {self.name} with', self.exchange.id, type(e).__name__, str(e))
+
     def __str__(self):
         return f"Strategy for {self.name} on exchange: {self.exchange}"
     # takes a strategy as an input and a webhook message for order routing
-
-if __name__ == '__main__':
-    entry = {'info': {'symbol': 'ETHUSDT', 'orderId': 3034101613, 'orderListId': -1, 'clientOrderId': 'FP4P5eBbTJBIZ9mJoVTGXg', 'transactTime': 1613507881576, 'price': '0.00000000', 'origQty': '0.33839000', 'executedQty': '0.33839000', 'cummulativeQuoteQty': '585.88540030', 'status': 'FILLED', 'timeInForce': 'GTC', 'type': 'MARKET', 'side': 'BUY', 'fills': [{'price': '1731.23000000', 'qty': '0.03572000', 'commission': '0.00036415', 'commissionAsset': 'BNB', 'tradeId': 297556828}, {'price': '1731.41000000', 'qty': '0.30267000', 'commission': '0.00308567', 'commissionAsset': 'BNB', 'tradeId': 297556829}]}, 'id': '3034101613', 'clientOrderId': 'FP4P5eBbTJBIZ9mJoVTGXg', 'timestamp': 1613507881576, 'datetime': '2021-02-16T20:38:01.576Z', 'lastTradeTimestamp': None, 'symbol': 'ETH/USDT', 'type': 'market', 'side': 'buy', 'price': 1731.3909994385176, 'amount': 0.33839, 'cost': 585.8854003, 'average': 1731.3909994385176, 'filled': 0.33839, 'remaining': 0.0, 'status': 'closed', 'fee': {'cost': 0.00344982, 'currency': 'BNB'}, 'trades': [{'info': {'price': '1731.23000000', 'qty': '0.03572000', 'commission': '0.00036415', 'commissionAsset': 'BNB', 'tradeId': 297556828}, 'timestamp': None, 'datetime': None, 'symbol': 'ETH/USDT', 'id': None, 'order': None, 'type': None, 'side': None, 'takerOrMaker': None, 'price': 1731.23, 'amount': 0.03572, 'cost': 61.839535600000005, 'fee': {'cost': 0.00036415, 'currency': 'BNB'}}, {'info': {'price': '1731.41000000', 'qty': '0.30267000', 'commission': '0.00308567', 'commissionAsset': 'BNB', 'tradeId': 297556829}, 'timestamp': None, 'datetime': None, 'symbol': 'ETH/USDT', 'id': None, 'order': None, 'type': None, 'side': None, 'takerOrMaker': None, 'price': 1731.41, 'amount': 0.30267, 'cost': 524.0458647, 'fee': {'cost': 0.00308567, 'currency': 'BNB'}}]}
-    exit ={'info': {'symbol': 'ETHUSDT', 'orderId': 3034101678, 'orderListId': -1, 'clientOrderId': '5bm6nBoJdlQjgT5sQH5cMm', 'transactTime': 1613507882033, 'price': '1736.59000000', 'origQty': '0.33839000', 'executedQty': '0.00000000', 'cummulativeQuoteQty': '0.00000000', 'status': 'NEW', 'timeInForce': 'GTC', 'type': 'LIMIT', 'side': 'SELL'}, 'id': '3034101678', 'clientOrderId': '5bm6nBoJdlQjgT5sQH5cMm', 'timestamp': 1613507882033, 'datetime': '2021-02-16T20:38:02.033Z', 'lastTradeTimestamp': None, 'symbol': 'ETH/USDT', 'type': 'limit', 'side': 'sell', 'price': 1736.59, 'amount': 0.33839, 'cost': 0.0, 'average': None, 'filled': 0.0, 'remaining': 0.33839, 'status': 'open', 'fee': None, 'trades': None}
