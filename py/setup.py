@@ -1,8 +1,5 @@
 import os
-commands = ["export FLASK_APP=app",
-            'export FLASK_APP=app',
-            'flask run']
-
+from py.core.create_db import Database
 if __name__ == '__main__':
     print('                         WELCOME TO AUTOBOT\n'
           '\n------------------------------------------------------------------------------\n'
@@ -218,21 +215,15 @@ if __name__ == '__main__':
           'If you dont not have these requirements you should exit the set up'
           ' and figure out if you should even be trading!\n')
 
-    API_ID = input('please enter (1) trading account api id: ')
-    API_KEY = input('please enter (2) trading account api secret key: ')
-    email_address = input('please enter your email address')
-    email_password = input('please enter your email password ')
-    values = [API_ID, API_KEY, email_address, email_password]
-
-    outF = open("../config.txt", "w")
-    for line in values:
-        # write line to output file
-        outF.write(line)
-        outF.write("\n")
-    outF.close()
+    newdb = Database()
+    newdb.add_new_user()
     startup = input('Would you like to run the bot now? Y or N ')
+    commands = ["export FLASK_APP=app",
+                'export FLASK_ENV=development']
+    for command in commands:
+        os.system(command)
+
     if startup == 'y' or "Y":
-        for command in commands:
-            os.system(command)
+        os.system('flask run')
     else:
         exit()

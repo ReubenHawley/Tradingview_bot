@@ -1,4 +1,3 @@
-import os
 import ccxt
 import pandas as pd
 from termcolor import colored
@@ -6,20 +5,21 @@ from py.core.dashboard import Portfolio
 
 
 class Account:
-    def __init__(self, name, config):
+    def __init__(self, name, api_k, api_s):
         self.name = name
         """Instantiate email client"""
         """ open the config file to retrieve the apikey and secret 
         instantiate Auto bot"""
-        self.c_dir = os.path.dirname(__file__)
-        with open(os.path.join(self.c_dir, config)) as key_file:
-            self.api_key, self.secret, _, _ = key_file.read().splitlines()
+        # self.c_dir = os.path.dirname(__file__)
+        # with open(os.path.join(self.c_dir, config)) as key_file:
+        #     self.api_key, self.secret, _, _ = key_file.read().splitlines()
         "Instantiate the exchange"
         self.exchange = ccxt.binance()
-        self.exchange.apiKey = self.api_key
-        self.exchange.secret = self.secret
+        self.exchange.apiKey = api_k
+        self.exchange.secret = api_s
         "instantiate portfolio"
         self.account = Portfolio(self.exchange)
+        self.min_trade_size :float = 10
 
     def account_holdings(self):
         wallet_holdings = self.exchange.fetch_balance()
@@ -59,10 +59,17 @@ class Account:
 
     def order_amount(self, symbol, amount, position_type):
         try:
+            free = self.exchange.fetch_free_balance()
+
             if position_type == 'relative':
-                usdt_amount = (self.exchange.fetch_free_balance()['USDT'] / 100) * amount
-                positional_amount = float(usdt_amount / self.exchange.fetch_ticker(symbol)['close'])
-                return positional_amount
+                if free['USDT'] > 10:
+                    usdt_amount = (free['USDT'] / 100) * amount
+                    positional_amount = float(usdt_amount / self.exchange.fetch_ticker(symbol)['close'])
+                    return positional_amount
+                else:
+                    print(f"order not submitted for {self.name}, USDT account balance: "
+                          f"{free['USDT']}")
+                    return None
             elif position_type == 'absolute':
                 positional_amount = float(amount)
                 return positional_amount
@@ -105,7 +112,7 @@ class Account:
         amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
         "do a check to see if the trade is possible"
         try:
-            if trade_parameters is not None:
+            if trade_parameters and amount is not None:
                 if len(self.exchange.fetch_open_orders(trade_symbol)) < max_trades:
                     if symbol == trade_symbol:
                         if side == "BUY":
@@ -142,7 +149,8 @@ class Account:
                         return '200'
                     else:
                         print(
-                            f'order received for {self.name} on symbol:{symbol} but strategy is of symbol:{trade_symbol}')
+                            f'order received for {self.name} on symbol:{symbol} '
+                            f'but strategy is of symbol:{trade_symbol}')
                 else:
                     print(f'{max_trades} open trades allowed, current open trades for {self.name}: '
                           f'{len(self.exchange.fetch_open_orders(trade_symbol))}')
@@ -158,7 +166,7 @@ class Account:
         quote = trade_parameters[1]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = round(self.order_amount(symbol=symbol, position_type=position_type), 2)
+        amount = round(self.order_amount(symbol=symbol, amount=min_trade_size, position_type=position_type), 2)
         print(amount)
         "do a check to see if the trade is possible"
         try:
@@ -227,6 +235,51 @@ class Account:
                               f'{len(self.exchange.fetch_open_orders(trade_symbol))}')
                 else:
                     return "None type received, catching error"
+        except Exception as e:
+            print(f'Failed to create order for {self.name} with', self.exchange.id, type(e).__name__, str(e))
+
+    def trendfollower(self, trade_symbol, trade_parameters):
+        base = trade_parameters[0]
+        quote = trade_parameters[1]
+        quantity = float(trade_parameters[2])
+        side = trade_parameters[3]
+        symbol = f'{quote}/{base}'
+        position_type = trade_parameters[6]
+        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
+        "do a check to see if the trade is possible"
+        try:
+            if trade_parameters and amount is not None:
+                if symbol == trade_symbol:
+                    if side == "BUY":
+                        if self.exchange.fetch_free_balance()[base] > self.min_trade_size:
+                            if float(amount) * self.exchange.fetch_ticker(symbol)['close'] > self.min_trade_size:
+                                "returns the response from the exchange, whether successful or not"
+                                entry_order_response = self.exchange.create_market_buy_order(symbol,
+                                                                                             amount=amount)
+                                trade_data = [entry_order_response['timestamp'],
+                                              entry_order_response['symbol'],
+                                              entry_order_response['side'],
+                                              entry_order_response['price'],
+                                              entry_order_response['amount'],
+                                              entry_order_response['cost'],
+                                              entry_order_response['fee']['cost']
+                                              ]
+                                self.account.add_to_csv(trade_data)
+                                print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
+                                              'green'))
+
+                            else:
+                                print(colored(f"order not submitted, balance insufficient on {self.name}s account",
+                                              'red'))
+                    else:
+                        print(colored(f"order not submitted for {self.name}, balance insufficient", 'red'))
+                    return '200'
+                else:
+                    print(
+                        f'order received for {self.name} on symbol:{symbol} '
+                        f'but strategy is of symbol:{trade_symbol}')
+            else:
+                return "None type received, catching error"
         except Exception as e:
             print(f'Failed to create order for {self.name} with', self.exchange.id, type(e).__name__, str(e))
 

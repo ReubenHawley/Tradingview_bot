@@ -1,43 +1,70 @@
 import sqlite3
-import ccxt
 
 
-"instantiate database"
-connection = sqlite3.connect('tvBot.db')
-cursor = connection.cursor()
+class Database:
+    def __init__(self):
+        """instantiate database"""
+        self.connection = sqlite3.connect('../data/tvBot.db')
+        self.connection.row_factory = sqlite3.Row
+        self.cursor = self.connection.cursor()
+        self.create_table()
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS crypto (
-        id INTEGER PRIMARY KEY, 
-        ticker TEXT NOT NULL UNIQUE, 
-        base TEXT NOT NULL,
-        quote TEXT NOT NULL,
-        symbol TEXT NOT NULL,
-        min_notional REAL NOT NULL
-    )
-""")
+    def create_table(self):
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS users (
+                user_id INTEGER PRIMARY KEY,
+                username TEXT NOT NULL,
+                email TEXT NOT NULL,
+                api_key TEXT NOT NULL UNIQUE,
+                api_secret TEXT NOT NULL UNIQUE,
+                trendfollower TEXT NOT NULL,
+                twopercent TEXT NOT NULL,
+                gridtrader TEXT NOT NULL
+            )
+        """)
+        return 'successfully created database'
 
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS coin_price (
-        id INTEGER PRIMARY KEY, 
-        crypto_id INTEGER,
-        date NOT NULL,
-        open NOT NULL, 
-        high NOT NULL, 
-        low NOT NULL, 
-        close NOT NULL, 
-        adjusted_close NOT NULL, 
-        volume NOT NULL,
-        FOREIGN KEY (crypto_id) REFERENCES crypto (id)
-    )
-""")
+    def add_new_user(self):
+        if self.connection:
+            id = input('please enter userid: ')
+            name = input('please enter your name: ')
+            API_ID = input('please enter (1) trading account api id: ')
+            API_KEY = input('please enter (2) trading account api secret key: ')
+            email_address = input('please enter your email address')
+            trendfollower = input('is this the trendfollowing strat? true/false: ')
+            twopercent = input('is this the 2% strat? true/false: ')
+            gridtrader = input('is this the gridtrader strat? true/false: ')
 
-binance = ccxt.binance()
-markets = binance.fetch_markets()
-for market in markets:
-    if 'USDT' in market['id']:
-        print(market['filters'])
-        #cursor.execute("INSERT INTO stock (ticker, base, quote, symbol, min_notional ) VALUES (?,?,?,?,?)",
-        # (market['id'], market['base'], market['quote'], market['symbol']))
+            self.cursor.execute("""INSERT INTO users VALUES
+                    (:key,
+                    ':username:',
+                    ':email',
+                    ':api_key',
+                    ':api_secret',
+                    ':trendfollower',
+                    ':twopercent',
+                    ':gridtrader'
+                    )
+                    """, {
+                'key': id,
+                'username': name,
+                'email': email_address,
+                'api_key': API_ID,
+                'api_secret': API_KEY,
+                'trendfollower': trendfollower,
+                'twopercent': twopercent,
+                'gridtrader': gridtrader
+            })
+            self.connection.commit()
+            self.cursor.close()
+            return "user successfully added"
+        else:
+            print('connection closed, reestablishing connection')
+            self.connection = sqlite3.connect('../data/tvBot.db')
+            self.connection.row_factory = sqlite3.Row
+            self.cursor = self.connection.cursor()
+            self.add_new_user()
 
-connection.commit()
+
+if __name__ == '__main__':
+    tvbot_users = Database()
+    tvbot_users.add_new_user()
