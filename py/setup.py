@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from py.core.create_db import Database
+
 if __name__ == '__main__':
     print('                         WELCOME TO AUTOBOT\n'
           '\n------------------------------------------------------------------------------\n'
@@ -217,15 +217,17 @@ if __name__ == '__main__':
           ' and figure out if you should even be trading!\n')
 
     name = input('please enter your name: ')
+    id = input('please enter user_id: ')
     API_ID = input('please enter (1) trading account api id: ')
     API_KEY = input('please enter (2) trading account api secret key: ')
-    email_address = input('please enter your email address')
+    email_address = input('please enter your email address: ')
     trendfollower = input('is this the trendfollowing strat? true/false: ')
     twopercent = input('is this the 2% strat? true/false: ')
     gridtrader = input('is this the gridtrader strat? true/false: ')
 
     "instantiate database"
-    connection = sqlite3.connect('../data/tvBot.db')
+    script_dir = os.path.abspath("data/tvBot.db")
+    connection = sqlite3.connect(script_dir)
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
 
@@ -242,7 +244,7 @@ if __name__ == '__main__':
     """)
 
     cursor.execute("""INSERT INTO users VALUES
-            ('1',
+            (':user_id',
             ':username:',
             ':email',
             ':api_key',
@@ -252,6 +254,7 @@ if __name__ == '__main__':
             ':gridtrader'
             )
             """, {
+        'user_id': id,
         'username': name,
         'email': email_address,
         'api_key': API_ID,
