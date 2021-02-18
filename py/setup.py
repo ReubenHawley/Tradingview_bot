@@ -1,4 +1,5 @@
 import os
+import sqlite3
 from py.core.create_db import Database
 if __name__ == '__main__':
     print('                         WELCOME TO AUTOBOT\n'
@@ -215,8 +216,52 @@ if __name__ == '__main__':
           'If you dont not have these requirements you should exit the set up'
           ' and figure out if you should even be trading!\n')
 
-    newdb = Database()
-    newdb.add_new_user()
+    name = input('please enter your name: ')
+    API_ID = input('please enter (1) trading account api id: ')
+    API_KEY = input('please enter (2) trading account api secret key: ')
+    email_address = input('please enter your email address')
+    trendfollower = input('is this the trendfollowing strat? true/false: ')
+    twopercent = input('is this the 2% strat? true/false: ')
+    gridtrader = input('is this the gridtrader strat? true/false: ')
+
+    "instantiate database"
+    connection = sqlite3.connect('../data/tvBot.db')
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+
+    cursor.execute("""CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY,
+            username TEXT NOT NULL,
+            email TEXT NOT NULL,
+            api_key TEXT NOT NULL UNIQUE,
+            api_secret TEXT NOT NULL UNIQUE,
+            trendfollower TEXT NOT NULL,
+            twopercent TEXT NOT NULL,
+            gridtrader TEXT NOT NULL
+        )
+    """)
+
+    cursor.execute("""INSERT INTO users VALUES
+            ('1',
+            ':username:',
+            ':email',
+            ':api_key',
+            ':api_secret',
+            ':trendfollower',
+            ':twopercent',
+            ':gridtrader'
+            )
+            """, {
+        'username': name,
+        'email': email_address,
+        'api_key': API_ID,
+        'api_secret': API_KEY,
+        'trendfollower': trendfollower,
+        'twopercent': twopercent,
+        'gridtrader': gridtrader
+    })
+    connection.commit()
+    cursor.close()
     startup = input('Would you like to run the bot now? Y or N ')
     commands = ["export FLASK_APP=app",
                 'export FLASK_ENV=development']
