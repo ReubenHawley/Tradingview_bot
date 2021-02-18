@@ -6,27 +6,22 @@ from flask_ngrok import run_with_ngrok
 import threading
 from py.core.account import Account
 import os
-script_dir = os.path.abspath("..")
+import sqlite3
+script_dir = os.path.abspath("data/tvBot.db")
 
 
-""" USER SETTINGS """
-user2_config = f'{script_dir}/config.txt'
-user2 = Account(name='chris', config=user2_config)
+connection = sqlite3.connect(script_dir)
+connection.row_factory = sqlite3.Row
+cursor = connection.cursor()
 
-
-user1_config = f'{script_dir}/config_jeroen.txt'
-user1 = Account(name='jeroen', config=user1_config)
-
-user3_config = f'{script_dir}/config_reuben.txt'
-user3 = Account(name='Willem', config=user3_config)
-
-
+cursor.execute(""" SELECT * FROM users WHERE user_id='2' """)
+traders = dict(result=[dict(r) for r in cursor.fetchall()])
+for trader in traders['result']:
+    user1 = Account(name=trader['username'],
+                    api_k=trader['api_key'],
+                    api_s=trader['api_secret'])
 """TRADE PARAMETERS"""
-SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 120, 'premium': 1.003, 'minimum_trade_size': 10},
-               {"symbol": "ETH/USDT", "max_trades": 120, 'premium': 1.003, 'minimum_trade_size': 10},
-               {"symbol": "DOT/USDT", "max_trades": 40, 'premium': 1.003, 'minimum_trade_size': 10},
-                {"symbol": "CRV/USDT", "max_trades": 40, 'premium': 1.003, 'minimum_trade_size': 10},
-               {"symbol": "OCEAN/USDT", "max_trades": 40, 'premium': 1.003, 'minimum_trade_size': 10}]
+SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 120, 'premium': 1.005, 'minimum_trade_size': 10}]
 
 # actual web server starts here #
 app = Flask(__name__)
@@ -44,10 +39,10 @@ def dashboard():
 # visible dashboard which to view and interact
 def account():
     return render_template('account.html',
-                           usdt_balance=user3.available_balance(),
-                           btc_holdings=user3.btc_holdings(),
-                           total_usdt_value=user3.account_value(),
-                           coins=user3.account_holdings(),
+                           usdt_balance=user1.available_balance(),
+                           btc_holdings=user1.btc_holdings(),
+                           total_usdt_value=user1.account_value(),
+                           coins=user1.account_holdings(),
                            )
 
 
@@ -56,7 +51,7 @@ def account():
 def trade_history():
     trades = []
     for symbol in SYMBOL_LIST:
-        trades += user2.exchange.fetch_my_trades(symbol["symbol"])
+        trades += user1.exchange.fetch_my_trades(symbol["symbol"])
         trades.reverse()
 
     return render_template('trade_history.html', trades=trades, symbols=SYMBOL_LIST)
@@ -66,9 +61,9 @@ def trade_history():
 def orders():
     open_orders = []
     for symbol in SYMBOL_LIST:
-        open_orders += user3.exchange.fetch_open_orders(symbol['symbol'])
+        open_orders += user1.exchange.fetch_open_orders(symbol['symbol'])
     open_orders.reverse()
-    btc = user3.exchange.fetch_ticker('BTC/USDT')['close']
+    btc = user1.exchange.fetch_ticker('BTC/USDT')['close']
     return render_template('orders.html',
                            open_orders=open_orders,
                            btc=btc)
@@ -83,36 +78,30 @@ def webhook():
         # " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         trade_parameters = list(webhook_message.values())
+
+        "iterate over database for all users that subscribe to the strategy . twopercent:'true' "
+        cursor.execute(""" SELECT * FROM users WHERE twopercent='true' """)
+        traders = dict(result=[dict(r) for r in cursor.fetchall()])
         threads = []
         for symbol in SYMBOL_LIST:
-            t1 = threading.Thread(target=user2.market_maker, args=(symbol['symbol'],
-                                                                   symbol['max_trades'],
-                                                                   symbol['premium'],
-                                                                   symbol['minimum_trade_size'],
-                                                                   trade_parameters,))
-            t1.start()
-            threads.append(t1)
-            t2 = threading.Thread(target=user3.market_maker, args=(symbol['symbol'],
-                                                                   symbol['max_trades'],
-                                                                   symbol['premium'],
-                                                                   symbol['minimum_trade_size'],
-                                                                   trade_parameters,))
-            t2.start()
-
-            threads.append(t2)
-        t3 = threading.Thread(target=user1.market_maker, args=(SYMBOL_LIST[0]['symbol'],
-                                                               SYMBOL_LIST[0]['max_trades'],
-                                                               SYMBOL_LIST[0]['premium'],
-                                                               SYMBOL_LIST[0]['minimum_trade_size'],
-                                                               trade_parameters,))
-        t3.start()
-        threads.append(t3)
+            for trader in traders['result']:
+                user = Account(name=trader['username'],
+                               api_k=trader['api_key'],
+                               api_s=trader['api_secret'])
+                t1 = threading.Thread(target=user.market_maker, args=(symbol['symbol'],symbol['max_trades'],
+                                                                      symbol['premium'],symbol['minimum_trade_size'],
+                                                                      trade_parameters,))
+                t1.start()
+                threads.append(t1)
+        connection.commit()
         for thread in threads:
             thread.join()
         return f"Trade successfully executed"
 
     except Exception as error:
         print('type is:', error.__class__.__name__)
+        print('error occurred,closing database')
+        cursor.close()
         print_exc()
 
 
