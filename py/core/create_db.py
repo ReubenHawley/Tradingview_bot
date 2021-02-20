@@ -1,5 +1,5 @@
 import sqlite3
-from py.core.account import Account
+
 # TODO create class database for db calls
 "instantiate database"
 connection = sqlite3.connect('../data/tvBot.db')
