@@ -1,6 +1,5 @@
 import sqlite3
 
-# TODO create class database for db calls
 "instantiate database"
 connection = sqlite3.connect('../data/tvBot.db')
 connection.row_factory = sqlite3.Row
@@ -23,7 +22,7 @@ def delete_user():
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
 
-    cursor.execute("""DELETE FROM users WHERE username='johannes'""")
+    cursor.execute("""DELETE FROM users WHERE user_id='6'""")
 
 
 def add_new_user():
@@ -43,13 +42,13 @@ def add_new_user():
 
     cursor.execute("""INSERT INTO users VALUES
             (:key,
-            ':username:',
-            ':email',
-            ':api_key',
-            ':api_secret',
-            ':trendfollower',
-            ':twopercent',
-            ':gridtrader'
+            :username:,
+            :email,
+            :api_key,
+            :api_secret,
+            :trendfollower,
+            :twopercent,
+            :gridtrader
             )
             """, {
         'key': user_id,
@@ -65,5 +64,11 @@ def add_new_user():
     cursor.close()
 
 
-if __name__ == '__main__':
-    add_new_user()
+def find_user_info():
+    connection = sqlite3.connect('../data/tvBot.db')
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+
+    cursor.execute(""" SELECT * FROM users WHERE username ='chris' AND twopercent='true'""")
+    traders = dict(result=[dict(r) for r in cursor.fetchall()])
+    return traders['result']
