@@ -217,7 +217,7 @@ if __name__ == '__main__':
           ' and figure out if you should even be trading!\n')
 
     name = input('please enter your name: ')
-    id = input('please enter user_id: ')
+    id = int(input('please enter user_id: '))
     API_ID = input('please enter (1) trading account api id: ')
     API_KEY = input('please enter (2) trading account api secret key: ')
     email_address = input('please enter your email address: ')

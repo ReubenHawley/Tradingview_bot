@@ -21,7 +21,7 @@ for trader in traders['result']:
                     api_k=trader['api_key'],
                     api_s=trader['api_secret'])
 """TRADE PARAMETERS"""
-SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 120, 'premium': 1.005, 'minimum_trade_size': 10}]
+SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 120, 'premium': 1.02, 'minimum_trade_size': 10}]
 
 # actual web server starts here #
 app = Flask(__name__)
