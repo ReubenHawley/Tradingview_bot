@@ -106,10 +106,12 @@ class Account:
         base = trade_parameters[0]
         quote = trade_parameters[1]
         quantity = float(trade_parameters[2])
+        print(quantity)
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
         amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
+        print(amount)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters and amount is not None:
