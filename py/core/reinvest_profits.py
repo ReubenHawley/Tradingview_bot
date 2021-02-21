@@ -2,6 +2,7 @@ from py.core.account import Account
 import sqlite3
 from py.core.create_db import find_user_info as getUsers
 import time
+import csv
 
 if __name__ == '__main__':
     "instantiate database"
@@ -29,11 +30,21 @@ if __name__ == '__main__':
         free = user.exchange.fetch_free_balance()
         if daily_return < free['USDT']:
             close = user.exchange.fetch_ticker('BTC/USDT')['close']
-            buy = daily_return/close
+            buy = 11/close # change the value  "value/close" amount when testing
             response = user.exchange.create_market_buy_order('BTC/USDT', buy)
+            trade_data = [response['timestamp'],
+                          response['symbol'],
+                          response['side'],
+                          response['price'],
+                          response['amount'],
+                          response['cost'],
+                          response['fee']['cost']
+                          ]
             if response:
-                print(response)
-                break
+                with open('../trade_data/executed_trades.csv', mode='a') as output_file:
+                    csv_writer = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    csv_writer.writerow(trade_data)
+                exit()
         else:
             time.sleep(60)
             continue

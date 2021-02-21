@@ -42,7 +42,7 @@ def add_new_user():
 
     cursor.execute("""INSERT INTO users VALUES
             (:key,
-            :username:,
+            :username,
             :email,
             :api_key,
             :api_secret,
@@ -69,6 +69,9 @@ def find_user_info():
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
 
-    cursor.execute(""" SELECT * FROM users WHERE username ='chris' AND twopercent='true'""")
+    cursor.execute(""" SELECT * FROM users WHERE username ='chris'""")
     traders = dict(result=[dict(r) for r in cursor.fetchall()])
     return traders['result']
+
+if __name__ == '__main__':
+    add_new_user()

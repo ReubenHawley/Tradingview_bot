@@ -14,12 +14,12 @@ connection = sqlite3.connect(script_dir)
 connection.row_factory = sqlite3.Row
 cursor = connection.cursor()
 
-cursor.execute(""" SELECT * FROM users WHERE user_id='2' """)
+cursor.execute(""" SELECT * FROM users WHERE username='chris' """)
 traders = dict(result=[dict(r) for r in cursor.fetchall()])
-for trader in traders['result']:
-    user1 = Account(name=trader['username'],
-                    api_k=trader['api_key'],
-                    api_s=trader['api_secret'])
+user1 = Account(name=traders['result'][0]['username'],
+                api_k=traders['result'][0]['api_key'],
+                api_s=traders['result'][0]['api_secret'])
+
 """TRADE PARAMETERS"""
 SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 120, 'premium': 1.02, 'minimum_trade_size': 10}]
 
@@ -38,11 +38,22 @@ def dashboard():
 @app.route('/account')
 # visible dashboard which to view and interact
 def account():
+    account2 = traders['result'][1]
+    user2 = Account(name=account2['username'],
+                    api_k=account2['api_key'],
+                    api_s=account2['api_secret'])
+
+    account3 = traders['result'][2]
+    user3 = Account(name=account3['username'],
+                    api_k=account3['api_key'],
+                    api_s=account3['api_secret'])
     return render_template('account.html',
                            usdt_balance=user1.available_balance(),
                            btc_holdings=user1.btc_holdings(),
                            total_usdt_value=user1.account_value(),
-                           coins=user1.account_holdings(),
+                           coins1=user1.account_holdings(),
+                           coins2=user2.account_holdings(),
+                           coins3=user3.account_holdings(),
                            )
 
 
