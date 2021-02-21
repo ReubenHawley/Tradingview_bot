@@ -22,13 +22,14 @@ class Account:
         self.min_trade_size :float = 10
 
     def account_holdings(self):
-        wallet_holdings = self.exchange.fetch_balance()
-        coins = wallet_holdings.pop('info')
-        df = pd.DataFrame(coins['balances'])
-        df['free'] = df['free'].astype(float)
-        df['locked'] = df['locked'].astype(float)
-        df = df.loc[(df['free'] > 0.000000)]
-        return df.to_html(classes='coin_holdings')
+        free = self.exchange.fetch_balance()
+
+        coin_holdings = []
+        for coin in free['info']['balances']:
+            if float(coin['free']) > 0.0:
+                coin_holdings.append(coin)
+        return coin_holdings
+
 
     def outstanding_on_order(self, symbol='BTC/USDT'):
         open_orders = self.exchange.fetch_open_orders(symbol)
