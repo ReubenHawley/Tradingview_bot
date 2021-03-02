@@ -100,28 +100,28 @@ table.dataframe, .dataframe th, .dataframe td {
           </div>
           <div>
             <h2> Alts Account </h2>
-            {% for coin in coins1 %}
+            {% for coin in accounts[0].account_holdings() %}
                   <div>{{coin.asset}}</div>
                   <div>free: {{coin.free}}</div>
-                  <div>locked: {{coin.free}}</div>
+                  <div>locked: {{coin.locked}}</div>
               <hr>
             {% endfor %}
           </div>
           <div>
             <h2> 2% Account </h2>
-           {% for coin in coins2 %}
+           {% for coin in accounts[1].account_holdings() %}
                   <div>{{coin.asset}}</div>
                   <div>free: {{coin.free}}</div>
-                  <div>locked: {{coin.free}}</div>
+                  <div>locked: {{coin.locked}}</div>
               <hr>
             {% endfor %}
           </div>
           <div>
             <h2> Trending Account </h2>
-           {% for coin in coins3 %}
+           {% for coin in accounts[2].account_holdings() %}
                   <div>{{coin.asset}}</div>
                   <div>free: {{coin.free}}</div>
-                  <div>locked: {{coin.free}}</div>
+                  <div>locked: {{coin.locked}}</div>
               <hr>
             {% endfor %}
           </div>

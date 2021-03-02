@@ -77,6 +77,11 @@
                 </tr>
               </thead>
               <tbody>
+              {% set trades = [] %}
+              {% for symbol in symbols %}
+                {{ trades.append(accounts[0].exchange.fetch_my_trades(symbol["symbol"])) }}
+              {%endfor%}
+              {{ trades.reverse() }}
                 {% for trade in trades %}
                     <tr class="trades">
                         <td>{{trade.timestamp}}</td>
