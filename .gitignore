@@ -2,6 +2,7 @@
 trade_data/
 data/
 tvBot.db
+site.db
 # Environments
 .env
 .venv
