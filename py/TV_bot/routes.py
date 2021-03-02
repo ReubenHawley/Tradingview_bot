@@ -16,7 +16,7 @@ UI_accounts = User.query.filter_by(username='chris').all()
 accounts = {}
 "iterate over all sql objects to create dictionary of Account objects"
 for key, value in enumerate(UI_accounts):
-    accounts[key] = Account(value.username, value.api_key, value.api_secret)
+    accounts[key] = Account(value.username, value.id, value.api_key, value.api_secret)
 
 
 @app.route('/')
@@ -74,6 +74,7 @@ def webhook():
         for symbol in SYMBOL_LIST:
             for trader in traders:
                 user = Account(name=trader.username,
+                               id=trader.id,
                                api_k=trader.api_key,
                                api_s=trader.api_secret)
                 t1 = threading.Thread(target=user.market_maker, args=(symbol['symbol'],

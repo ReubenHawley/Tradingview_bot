@@ -5,8 +5,9 @@ from py.TV_bot import db
 
 
 class Account:
-    def __init__(self, name, api_k, api_s):
+    def __init__(self, name, id, api_k, api_s):
         self.name = name
+        self.id = id
         """Instantiate email client"""
         """ open the config file to retrieve the apikey and secret 
         instantiate Auto bot"""
@@ -125,7 +126,8 @@ class Account:
                                                         price=entry_order_response['price'],
                                                         amount=entry_order_response['amount'],
                                                         cost=entry_order_response['cost'],
-                                                        fees=entry_order_response['fee']['cost']
+                                                        fees=entry_order_response['fee']['cost'],
+                                                        user_id=self.id
                                                         )
                                     db.session.add(entry_trade)
                                     print(colored(f'entry trade submitted to DB for {self.name}: '
@@ -142,7 +144,8 @@ class Account:
                                                            price=entry_order_response['price'],
                                                            amount=entry_order_response['amount'],
                                                            cost=entry_order_response['cost'],
-                                                           fees=entry_order_response['fee']['cost']
+                                                           fees=entry_order_response['fee']['cost'],
+                                                           user_id=self.id
                                                            )
                                         db.session.add(exit_trade)
                                         db.session.commit()

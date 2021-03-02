@@ -27,5 +27,6 @@ def find_users_info(**kwargs):
 
 
 if __name__ == '__main__':
-    users = User.query.filter_by(username='chris').all()
-    print(users)
+    users = User.query.all()
+    for value in users:
+        print(value.id,value.username,value.email,value.api_key,value.api_secret,value.trending,value.twopercent,value.gridtrader )
