@@ -1,31 +1,13 @@
 #!/usr/bin/python3
 from traceback import print_exc
-from flask import Flask, request, render_template
+from flask import request, render_template
+from py.TV_bot import app
 from ast import literal_eval
-from flask_ngrok import run_with_ngrok
 import threading
-from py.core.account import Account
-import os
-import sqlite3
-script_dir = os.path.abspath("data/tvBot.db")
-
-
-connection = sqlite3.connect(script_dir)
-connection.row_factory = sqlite3.Row
-cursor = connection.cursor()
-
-cursor.execute(""" SELECT * FROM users WHERE username='chris' """)
-traders = dict(result=[dict(r) for r in cursor.fetchall()])
-user1 = Account(name=traders['result'][0]['username'],
-                api_k=traders['result'][0]['api_key'],
-                api_s=traders['result'][0]['api_secret'])
+from py.TV_bot.core.account import Account
 
 """TRADE PARAMETERS"""
 SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 120, 'premium': 1.02, 'minimum_trade_size': 10}]
-
-# actual web server starts here #
-app = Flask(__name__)
-run_with_ngrok(app)
 
 
 @app.route('/')
@@ -115,8 +97,3 @@ def webhook():
         cursor.close()
         print_exc()
 
-
-if __name__ == '__main__':
-    "instantiate the flask app in debug mode"
-    app.debug = True
-    app.run()

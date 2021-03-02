@@ -1,7 +1,5 @@
 import ccxt
-import pandas as pd
 from termcolor import colored
-from py.core.dashboard import Portfolio
 
 
 class Account:
@@ -18,8 +16,7 @@ class Account:
         self.exchange.apiKey = api_k
         self.exchange.secret = api_s
         "instantiate portfolio"
-        self.account = Portfolio(self.exchange)
-        self.min_trade_size :float = 10
+        self.min_trade_size:float = 10
 
     def account_holdings(self):
         free = self.exchange.fetch_balance()
@@ -132,7 +129,6 @@ class Account:
                                                   entry_order_response['cost'],
                                                   entry_order_response['fee']['cost']
                                                   ]
-                                    self.account.add_to_csv(trade_data)
                                     print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
                                                   'green'))
                                     selling_price = entry_order_response['price'] * premium
@@ -187,7 +183,6 @@ class Account:
                                       entry_order_response['cost'],
                                       entry_order_response['fee']['cost']
                                       ]
-                        self.account.add_to_csv(trade_data)
                         print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
                                       'green'))
                         selling_price = entry_order_response['price'] * premium
@@ -216,7 +211,6 @@ class Account:
                                                   entry_order_response['cost'],
                                                   entry_order_response['fee']['cost']
                                                   ]
-                                    self.account.add_to_csv(trade_data)
                                     print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
                                                   'green'))
                                     selling_price = entry_order_response['price'] * premium
@@ -267,7 +261,6 @@ class Account:
                                               entry_order_response['cost'],
                                               entry_order_response['fee']['cost']
                                               ]
-                                self.account.add_to_csv(trade_data)
                                 print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
                                               'green'))
 

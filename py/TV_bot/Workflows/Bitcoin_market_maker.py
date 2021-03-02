@@ -1,5 +1,5 @@
 import time
-from py.core.account import Account
+from py.TV_bot.core.account import Account
 from termcolor import colored
 import threading
 
