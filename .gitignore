@@ -1,6 +1,7 @@
-config.txt
-config_jeroen.txt
-config_reuben.txt
+### database ###
+trade_data/
+data/
+tvBot.db
 # Environments
 .env
 .venv

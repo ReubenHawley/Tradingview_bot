@@ -5,4 +5,5 @@
     "side": "BUY",
     "ordertype": "LIMIT",
     "price":"31552",
+    "strategy": "GRID",
 }

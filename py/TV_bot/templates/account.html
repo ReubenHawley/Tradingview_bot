@@ -91,7 +91,7 @@ table.dataframe, .dataframe th, .dataframe td {
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" style="background:'black;'">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Dashboard</h1>
+            <h1 class="h2">Account</h1>
             <div class="row">
                 <div class="column">BTC HOLDINGS: {{btc_holdings}}</div>
                 <div class="column">USDT: {{usdt_balance}}</div>
@@ -99,14 +99,31 @@ table.dataframe, .dataframe th, .dataframe td {
             </div>
           </div>
           <div>
-            <label>
-              todays pnl:
-            </label>
-            </div>
+            <h2> Alts Account </h2>
+            {% for coin in accounts[0].account_holdings() %}
+                  <div>{{coin.asset}}</div>
+                  <div>free: {{coin.free}}</div>
+                  <div>locked: {{coin.locked}}</div>
+              <hr>
+            {% endfor %}
+          </div>
           <div>
-            <label>
-              todays total trade volume:
-            </label>
+            <h2> 2% Account </h2>
+           {% for coin in accounts[1].account_holdings() %}
+                  <div>{{coin.asset}}</div>
+                  <div>free: {{coin.free}}</div>
+                  <div>locked: {{coin.locked}}</div>
+              <hr>
+            {% endfor %}
+          </div>
+          <div>
+            <h2> Trending Account </h2>
+           {% for coin in accounts[2].account_holdings() %}
+                  <div>{{coin.asset}}</div>
+                  <div>free: {{coin.free}}</div>
+                  <div>locked: {{coin.locked}}</div>
+              <hr>
+            {% endfor %}
           </div>
         </main>
       </div>
