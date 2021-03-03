@@ -57,18 +57,19 @@ class Account:
         available_balance = round((self.exchange.fetch_free_balance()['USDT']), 2)
         return available_balance
 
-    def order_amount(self, symbol, amount, position_type):
+    def order_amount(self, symbol, amount, position_type, trade_parameters):
+        base = trade_parameters[0]
         try:
             free = self.exchange.fetch_free_balance()
 
             if position_type == 'relative':
-                if free['USDT'] > 10:
-                    usdt_amount = (free['USDT'] / 100) * amount
+                if free[base] > 10:
+                    usdt_amount = (free[base] / 100) * amount
                     positional_amount = float(usdt_amount / self.exchange.fetch_ticker(symbol)['close'])
                     return positional_amount
                 else:
                     print(f"order not submitted for {self.name}, USDT account balance: "
-                          f"{free['USDT']}")
+                          f"{free[base]}")
                     return None
             elif position_type == 'absolute':
                 positional_amount = float(amount)
@@ -109,7 +110,7 @@ class Account:
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
+        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type,trade_parameters=trade_parameters)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters and amount is not None:
@@ -177,7 +178,7 @@ class Account:
         quote = trade_parameters[1]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = round(self.order_amount(symbol=symbol, amount=min_trade_size, position_type=position_type), 2)
+        amount = round(self.order_amount(symbol=symbol, amount=min_trade_size, position_type=position_type,trade_parameters=trade_parameters), 2)
         print(amount)
         "do a check to see if the trade is possible"
         try:
@@ -254,7 +255,7 @@ class Account:
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
+        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type,trade_parameters=trade_parameters)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters and amount is not None:

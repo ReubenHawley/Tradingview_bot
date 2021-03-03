@@ -27,6 +27,12 @@ def find_users_info(**kwargs):
 
 
 if __name__ == '__main__':
-    users = User.query.all()
-    for value in users:
-        print(value.id,value.username,value.email,value.api_key,value.api_secret,value.trending,value.twopercent,value.gridtrader )
+    users = [] # add new users here
+    for user in users:
+        add_new_user(name=user[1],
+                     email=user[2],
+                     api_key=user[3],
+                     api_secret=user[4],
+                     trendfollower=user[5],
+                     twopercent=user[6],
+                     gridtrader=user[7])
