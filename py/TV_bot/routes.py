@@ -8,8 +8,8 @@ from py.TV_bot.core.account import Account
 from py.TV_bot.models import User
 
 """TRADE PARAMETERS"""
-SYMBOL_LIST = [{"symbol": "BTC/USDT", "max_trades": 160, 'premium': 1.02, 'minimum_trade_size': 10},
-               {"symbol": "ENJ/USDT", "max_trades": 50, 'premium': 1.01, 'minimum_trade_size': 10}]
+SYMBOL_LIST = [{"symbol": "BTC/BUSD", "max_trades": 160, 'premium': 1.02, 'minimum_trade_size': 10},
+               {"symbol": "ENJ/BUSD", "max_trades": 50, 'premium': 1.01, 'minimum_trade_size': 10}]
 "Get all accounts for user chris"
 UI_accounts = User.query.filter_by(username='chris').all()
 "create empty dictionary to which to append"

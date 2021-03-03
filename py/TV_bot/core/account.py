@@ -57,7 +57,7 @@ class Account:
         available_balance = round((self.exchange.fetch_free_balance()['USDT']), 2)
         return available_balance
 
-    def order_amount(self, symbol, amount, position_type,trade_parameters):
+    def order_amount(self, symbol, amount, position_type, trade_parameters):
         base = trade_parameters[0]
         try:
             free = self.exchange.fetch_free_balance()
@@ -110,7 +110,7 @@ class Account:
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
+        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type,trade_parameters=trade_parameters)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters and amount is not None:
@@ -178,7 +178,7 @@ class Account:
         quote = trade_parameters[1]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = round(self.order_amount(symbol=symbol, amount=min_trade_size, position_type=position_type), 2)
+        amount = round(self.order_amount(symbol=symbol, amount=min_trade_size, position_type=position_type,trade_parameters=trade_parameters), 2)
         print(amount)
         "do a check to see if the trade is possible"
         try:
@@ -255,7 +255,7 @@ class Account:
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type)
+        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type,trade_parameters=trade_parameters)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters and amount is not None:
