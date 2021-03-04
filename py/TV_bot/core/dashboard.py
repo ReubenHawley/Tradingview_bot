@@ -41,13 +41,21 @@ class Portfolio:
         return residual
 
     def current_avg_entry(self, symbol):
-        since = self.account.milliseconds() - 86400000  # -1 day from now
-        orders = self.account.fetch_open_orders(symbol, since, None)
-        total_usdt_buys: float = 0
-        for order in orders:
-            total_usdt_buys += order['price']
-        avg_entry = total_usdt_buys / len(orders)
-        return avg_entry
+        try:
+            since = self.account.milliseconds() - 86400000  # -1 day from now
+            orders = self.account.fetch_open_orders(symbol, since, None)
+            total_usdt_buys: float = 0
+            if orders:
+                for order in orders:
+                    total_usdt_buys += order['price']
+                avg_entry = total_usdt_buys / len(orders)
+                return avg_entry
+            else:
+                avg_entry = 0
+                return avg_entry
+        except ZeroDivisionError:
+            print("all trades exited, no trades open")
+            return 0
 
     def current_drawdown(self, symbol):
         avg_entry = self.current_avg_entry(symbol)
