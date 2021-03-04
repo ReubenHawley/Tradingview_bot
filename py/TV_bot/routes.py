@@ -17,6 +17,7 @@ accounts = {}
 "iterate over all sql objects to create dictionary of Account objects"
 for key, value in enumerate(UI_accounts):
     accounts[key] = Account(value.username, value.id, value.api_key, value.api_secret)
+print(accounts[0])
 
 
 @app.route('/')

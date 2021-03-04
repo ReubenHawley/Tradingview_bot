@@ -2,6 +2,7 @@ import ccxt
 from termcolor import colored
 from py.TV_bot.models import Trade
 from py.TV_bot import db
+from py.TV_bot.core.dashboard import Portfolio
 
 
 class Account:
@@ -20,6 +21,7 @@ class Account:
         self.exchange.secret = api_s
         "instantiate portfolio"
         self.min_trade_size: float = 10
+        self.portfolio = Portfolio(self.exchange)
 
     def account_holdings(self):
         free = self.exchange.fetch_balance()
@@ -28,7 +30,13 @@ class Account:
         for coin in free['info']['balances']:
             if float(coin['free']) > 0.0:
                 coin_holdings.append(coin)
+            elif float(coin['locked']) > 0.0:
+                coin_holdings.append(coin)
         return coin_holdings
+
+    def current_open_trades(self, symbol):
+        open_orders = self.exchange.fetch_open_orders(symbol)
+        return len(open_orders)
 
     def outstanding_on_order(self, symbol='BTC/USDT'):
         open_orders = self.exchange.fetch_open_orders(symbol)
@@ -54,8 +62,9 @@ class Account:
         return total_usdt_value
 
     def available_balance(self):
-        available_balance = round((self.exchange.fetch_free_balance()['USDT']), 2)
-        return available_balance
+        available_balance = self.exchange.fetch_free_balance()
+        total_usd = available_balance["USDT"]+available_balance['BUSD']
+        return round(total_usd,2)
 
     def order_amount(self, symbol, amount, position_type, trade_parameters):
         base = trade_parameters[0]

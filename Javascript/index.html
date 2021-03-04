@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradingview Bot</title>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <h2>trade stream</h2>
+    <div id="chart"></div>
+    <div id="trades"></div>
+    <h3>settings</h3>
+    <div id="settings">
+        <input type="checkbox" name="" id=""> RSI
+        <input type='text' id="rsi_length" name="rsi_length" placeholder="14"/>
+        oversold
+        <input type='text' id="rsi_oversold" name="rsi_oversold" placeholder="30"/>
+        overbought
+        <input type='text' id="rsi_overbought" name="rsi_overbought" placeholder="70"/>
+
+    </div>
+
+    <script src="index.js"></script>
+    <script src="chart.js"></script>
+</body>
+</html>
