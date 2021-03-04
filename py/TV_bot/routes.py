@@ -74,7 +74,7 @@ def webhook():
         for symbol in SYMBOL_LIST:
             for trader in traders:
                 user = Account(name=trader.username,
-                               id=trader.id,
+                               user_id=trader.id,
                                api_k=trader.api_key,
                                api_s=trader.api_secret)
                 t1 = threading.Thread(target=user.market_maker, args=(symbol['symbol'],
