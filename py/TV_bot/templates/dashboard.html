@@ -93,9 +93,9 @@ table.dataframe, .dataframe th, .dataframe td {
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
             <h1 class="h2">Dashboard</h1>
             <div class="row">
-                <div class="column">BTC HOLDINGS: {{btc_holdings}}</div>
-                <div class="column">USDT: {{usdt_balance}}</div>
-                <div class="column">ACCOUNT TOTAL IN USDT: {{total_usdt_value}}</div>
+                <div class="column">IN ORDER HOLDINGS: {{accounts[1].btc_holdings()}}</div>
+                <div class="column">FREE USD: {{accounts[1].available_balance()}}</div>
+                <div class="column">ACCOUNT TOTAL IN USD: {{accounts[1].total_usdt_value}}</div>
             </div>
           </div>
           <div class="dashboard-oversight">
@@ -115,9 +115,9 @@ table.dataframe, .dataframe th, .dataframe td {
               <div class="coin-info">
                 <h5>{{symbol.symbol}}</h5>
                 <div>open trades/total trades: {{accounts[1].current_open_trades(symbol.symbol)}} /{{symbol.max_trades}} </div>
-                <div>Average Entry: </div>
-                <div>drawdown: {{accounts[1].portfolio.current_drawdown(symbol.symbol)}}%</div>
-                <div>total holdings:</div>
+                <div>Average Entry: {{ accounts[1].portfolio.current_avg_entry(symbol.symbol)|round(2)  }}</div>
+                <div>drawdown: {{ accounts[1].portfolio.current_drawdown(symbol.symbol)|round(2) }}%</div>
+                <div>total holdings: {{ accounts[1].outstanding_on_order(symbol.symbol)|round(2) }}</div>
                 <div>total value:</div>
               </div>
           {% endfor %}

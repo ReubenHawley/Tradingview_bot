@@ -62,8 +62,9 @@ class Account:
         return total_usdt_value
 
     def available_balance(self):
-        available_balance = round((self.exchange.fetch_free_balance()['USDT']), 2)
-        return available_balance
+        available_balance = self.exchange.fetch_free_balance()
+        total_usd = available_balance["USDT"]+available_balance['BUSD']
+        return round(total_usd,2)
 
     def order_amount(self, symbol, amount, position_type, trade_parameters):
         base = trade_parameters[0]
