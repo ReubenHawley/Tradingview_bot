@@ -6,9 +6,9 @@ from py.TV_bot.core.dashboard import Portfolio
 
 
 class Account:
-    def __init__(self, name, id, api_k, api_s):
+    def __init__(self, name, user_id, api_k, api_s):
         self.name = name
-        self.id = id
+        self.id = user_id
         """Instantiate email client"""
         """ open the config file to retrieve the apikey and secret 
         instantiate Auto bot"""
@@ -64,7 +64,7 @@ class Account:
     def available_balance(self):
         available_balance = self.exchange.fetch_free_balance()
         total_usd = available_balance["USDT"]+available_balance['BUSD']
-        return round(total_usd,2)
+        return round(total_usd, 2)
 
     def order_amount(self, symbol, amount, position_type, trade_parameters):
         base = trade_parameters[0]
@@ -119,7 +119,10 @@ class Account:
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type,trade_parameters=trade_parameters)
+        amount = self.order_amount(symbol=symbol,
+                                   amount=quantity,
+                                   position_type=position_type,
+                                   trade_parameters=trade_parameters)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters and amount is not None:
@@ -140,14 +143,14 @@ class Account:
                                                         user_id=self.id
                                                         )
                                     db.session.add(entry_trade)
-                                    print(colored(f'entry trade submitted to DB for {self.name}: '
-                                                  f'{entry_order_response}', 'green'))
+                                    print(colored(f'entry trade submitted to DB for {self.name}: ', 'white'))
+                                    print(colored(f'{entry_order_response}', 'green'))
                                     selling_price = entry_order_response['price'] * premium
                                     if entry_order_response:
-                                        exit_order_response = self.exchange.create_limit_sell_order(symbol,
-                                                                                                    entry_order_response[
-                                                                                                        'amount'],
-                                                                                                    selling_price)
+                                        exit_order_response = \
+                                            self.exchange.create_limit_sell_order(symbol,
+                                                                                  entry_order_response['amount'],
+                                                                                  selling_price)
                                         exit_trade = Trade(timestamp=entry_order_response['timestamp'],
                                                            symbol=entry_order_response['symbol'],
                                                            side=entry_order_response['side'],
@@ -187,8 +190,10 @@ class Account:
         quote = trade_parameters[1]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = round(self.order_amount(symbol=symbol, amount=min_trade_size, position_type=position_type,trade_parameters=trade_parameters), 2)
-        print(amount)
+        amount = round(self.order_amount(symbol=symbol,
+                                         amount=min_trade_size,
+                                         position_type=position_type,
+                                         trade_parameters=trade_parameters), 2)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters is not None:
@@ -197,16 +202,18 @@ class Account:
                         "returns the response from the exchange, whether successful or not"
                         entry_order_response = self.exchange.create_market_buy_order(symbol,
                                                                                      amount=amount)
-                        trade_data = [entry_order_response['timestamp'],
-                                      entry_order_response['symbol'],
-                                      entry_order_response['side'],
-                                      entry_order_response['price'],
-                                      entry_order_response['amount'],
-                                      entry_order_response['cost'],
-                                      entry_order_response['fee']['cost']
-                                      ]
-                        print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
-                                      'green'))
+                        entry_trade = Trade(timestamp=entry_order_response['timestamp'],
+                                            symbol=entry_order_response['symbol'],
+                                            side=entry_order_response['side'],
+                                            price=entry_order_response['price'],
+                                            amount=entry_order_response['amount'],
+                                            cost=entry_order_response['cost'],
+                                            fees=entry_order_response['fee']['cost'],
+                                            user_id=self.id
+                                            )
+                        db.session.add(entry_trade)
+                        print(colored(f'entry trade submitted to DB for {self.name}: ', 'white'))
+                        print(colored(f'{entry_order_response}', 'green'))
                         selling_price = entry_order_response['price'] * premium
                         if entry_order_response:
                             exit_order_response = self.exchange.create_limit_sell_order(symbol,
@@ -225,22 +232,24 @@ class Account:
                                     "returns the response from the exchange, whether successful or not"
                                     entry_order_response = self.exchange.create_market_buy_order(symbol,
                                                                                                  amount=amount)
-                                    trade_data = [entry_order_response['timestamp'],
-                                                  entry_order_response['symbol'],
-                                                  entry_order_response['side'],
-                                                  entry_order_response['price'],
-                                                  entry_order_response['amount'],
-                                                  entry_order_response['cost'],
-                                                  entry_order_response['fee']['cost']
-                                                  ]
-                                    print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
-                                                  'green'))
+                                    entry_trade = Trade(timestamp=entry_order_response['timestamp'],
+                                                        symbol=entry_order_response['symbol'],
+                                                        side=entry_order_response['side'],
+                                                        price=entry_order_response['price'],
+                                                        amount=entry_order_response['amount'],
+                                                        cost=entry_order_response['cost'],
+                                                        fees=entry_order_response['fee']['cost'],
+                                                        user_id=self.id
+                                                        )
+                                    db.session.add(entry_trade)
+                                    print(colored(f'entry trade submitted to DB for {self.name}: ', 'white'))
+                                    print(colored(f'{entry_order_response}', 'green'))
                                     selling_price = entry_order_response['price'] * premium
                                     if entry_order_response:
-                                        exit_order_response = self.exchange.create_limit_sell_order(symbol,
-                                                                                                    entry_order_response[
-                                                                                                        'amount'],
-                                                                                                    selling_price)
+                                        exit_order_response = \
+                                            self.exchange.create_limit_sell_order(symbol,
+                                                                                  entry_order_response['amount'],
+                                                                                  selling_price)
                                         print(colored(f'entry trade submitted for {self.name}: {exit_order_response}',
                                                       'green'))
                                 else:
@@ -264,7 +273,10 @@ class Account:
         side = trade_parameters[3]
         symbol = f'{quote}/{base}'
         position_type = trade_parameters[6]
-        amount = self.order_amount(symbol=symbol, amount=quantity, position_type=position_type,trade_parameters=trade_parameters)
+        amount = self.order_amount(symbol=symbol,
+                                   amount=quantity,
+                                   position_type=position_type,
+                                   trade_parameters=trade_parameters)
         "do a check to see if the trade is possible"
         try:
             if trade_parameters and amount is not None:
@@ -275,16 +287,18 @@ class Account:
                                 "returns the response from the exchange, whether successful or not"
                                 entry_order_response = self.exchange.create_market_buy_order(symbol,
                                                                                              amount=amount)
-                                trade_data = [entry_order_response['timestamp'],
-                                              entry_order_response['symbol'],
-                                              entry_order_response['side'],
-                                              entry_order_response['price'],
-                                              entry_order_response['amount'],
-                                              entry_order_response['cost'],
-                                              entry_order_response['fee']['cost']
-                                              ]
-                                print(colored(f'entry trade submitted for {self.name}: {entry_order_response}',
-                                              'green'))
+                                entry_trade = Trade(timestamp=entry_order_response['timestamp'],
+                                                    symbol=entry_order_response['symbol'],
+                                                    side=entry_order_response['side'],
+                                                    price=entry_order_response['price'],
+                                                    amount=entry_order_response['amount'],
+                                                    cost=entry_order_response['cost'],
+                                                    fees=entry_order_response['fee']['cost'],
+                                                    user_id=self.id
+                                                    )
+                                db.session.add(entry_trade)
+                                print(colored(f'entry trade submitted to DB for {self.name}: ', 'white'))
+                                print(colored(f'{entry_order_response}', 'green'))
 
                             else:
                                 print(colored(f"order not submitted, balance insufficient on {self.name}s account",
