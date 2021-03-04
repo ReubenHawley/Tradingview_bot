@@ -114,8 +114,9 @@ table.dataframe, .dataframe th, .dataframe td {
           <hr>
               <div class="coin-info">
                 <h5>{{symbol.symbol}}</h5>
-                <div>open trades/total trades:{{symbol.max_trades}} </div>
-                <div>drawdown:</div>
+                <div>open trades/total trades: {{accounts[1].current_open_trades(symbol.symbol)}} /{{symbol.max_trades}} </div>
+                <div>Average Entry: </div>
+                <div>drawdown: {{accounts[1].portfolio.current_drawdown(symbol.symbol)}}%</div>
                 <div>total holdings:</div>
                 <div>total value:</div>
               </div>

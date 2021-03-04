@@ -40,8 +40,8 @@ class Portfolio:
         return residual
 
     def current_avg_entry(self, symbol):
-        since = self.account.exchange.milliseconds() - 86400000  # -1 day from now
-        orders = self.account.exchange.fetch_open_orders(symbol, since, None)
+        since = self.account.milliseconds() - 86400000  # -1 day from now
+        orders = self.account.fetch_open_orders(symbol, since, None)
         total_usdt_buys: float = 0
         for order in orders:
             total_usdt_buys += order['price']
@@ -50,7 +50,7 @@ class Portfolio:
 
     def current_drawdown(self, symbol):
         avg_entry = self.current_avg_entry(symbol)
-        close = self.account.exchange.fetch_ticker(symbol)['close']
+        close = self.account.fetch_ticker(symbol)['close']
         drawdown = 100 - (avg_entry/close)*100
         return drawdown
 
