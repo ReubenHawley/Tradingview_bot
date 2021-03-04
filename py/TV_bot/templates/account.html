@@ -99,7 +99,7 @@ table.dataframe, .dataframe th, .dataframe td {
             </div>
           </div>
           <div>
-            <h2> Alts Account </h2>
+            <h2> Trending Account </h2>
             {% for coin in accounts[0].account_holdings() %}
                   <div>{{coin.asset}}</div>
                   <div>free: {{coin.free}}</div>
@@ -117,7 +117,7 @@ table.dataframe, .dataframe th, .dataframe td {
             {% endfor %}
           </div>
           <div>
-            <h2> Trending Account </h2>
+            <h2> Master Account </h2>
            {% for coin in accounts[2].account_holdings() %}
                   <div>{{coin.asset}}</div>
                   <div>free: {{coin.free}}</div>

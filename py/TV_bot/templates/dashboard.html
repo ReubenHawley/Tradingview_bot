@@ -95,13 +95,15 @@ table.dataframe, .dataframe th, .dataframe td {
             <div class="row">
                 <div class="column">IN ORDER HOLDINGS: {{accounts[1].btc_holdings()}}</div>
                 <div class="column">FREE USD: {{accounts[1].available_balance()}}</div>
-                <div class="column">ACCOUNT TOTAL IN USD: {{accounts[1].total_usdt_value}}</div>
+                {% set total_holdings = accounts[1].btc_holdings() + accounts[1].available_balance() %}
+                <div class="column">ACCOUNT TOTAL IN USD: {{total_holdings}}</div>
             </div>
           </div>
+          {% for symbol in symbols %}
           <div class="dashboard-oversight">
             <div class="account-details">
             <label>
-              todays pnl:
+              todays gross {{symbol.symbol}} pnl: {{accounts[1].portfolio.todays_gross_profit(symbol.symbol) }}
             </label>
             </div>
           <div class="account-details">
@@ -110,7 +112,6 @@ table.dataframe, .dataframe th, .dataframe td {
             </label>
           </div>
           </div>
-          {% for symbol in symbols %}
           <hr>
               <div class="coin-info">
                 <h5>{{symbol.symbol}}</h5>
@@ -120,6 +121,7 @@ table.dataframe, .dataframe th, .dataframe td {
                 <div>total holdings: {{ accounts[1].outstanding_on_order(symbol.symbol)|round(2) }}</div>
                 <div>total value:</div>
               </div>
+          <hr>
           {% endfor %}
         </main>
       </div>

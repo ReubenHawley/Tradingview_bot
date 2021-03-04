@@ -1,6 +1,7 @@
 import os
 import csv
 
+
 class Portfolio:
     def __init__(self, account):
         self.account = account
@@ -26,8 +27,8 @@ class Portfolio:
             csv_writer.writerow(data)
 
     def todays_gross_profit(self, symbol):
-        since = self.account.exchange.milliseconds() - 86400000  # -1 day from now
-        orders = self.account.exchange.fetch_orders(symbol, since, None)
+        since = self.account.milliseconds() - 86400000  # -1 day from now
+        orders = self.account.fetch_orders(symbol, since, None)
         total_usdt_buys: float = 0
         total_usdt_sells: float = 0
         for order in orders:
