@@ -21,18 +21,12 @@ def add_new_user(name, email, api_key, api_secret,
     db.session.commit()
 
 
-def find_users_info(**kwargs):
+def find_users_info(*args, **kwargs):
     accounts = User.query.filter_by(kwargs).all()
     return accounts
 
 
 if __name__ == '__main__':
-    users = [] # add new users here
-    for user in users:
-        add_new_user(name=user[1],
-                     email=user[2],
-                     api_key=user[3],
-                     api_secret=user[4],
-                     trendfollower=user[5],
-                     twopercent=user[6],
-                     gridtrader=user[7])
+   accounts = User.query.filter_by(username='chris').all()
+   for account in accounts:
+       print(account.username, account.api_key,account.api_secret,account.twopercent)
