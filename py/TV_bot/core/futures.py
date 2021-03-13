@@ -111,25 +111,51 @@ class Futures(Account):
             })
             print(response)
 
+    def transfer_funds(self, amount, coin,account):
+        # 1: transfer from spot account to USDT-Ⓜ futures account.
+        # 2: transfer from USDT-Ⓜ futures account to spot account.
+        # 3: transfer from spot account to COIN-Ⓜ futures account.
+        # 4: transfer from COIN-Ⓜ futures account to spot account.
+        # code = 'USDT'
+        # amount = 123.45
+        currency = self.exchange.currency(coin)
 
-    def create_order(self, symbol, order_type, side, amount, price, *args, **kwargs):
-        # symbol = 'ETH/BTC'
-        # type = 'limit'  # or 'market'
-        # side = 'sell'  # or 'buy'
-        # amount = 1.0
-        # price = 0.060154  # or None
+        print('Moving', symbol, 'funds from your spot account to your futures account:')
 
-        # extra params and overrides if needed
-        params = {
-            'positionSide': 'LONG',
-            'test': True
-        }
-
-        order = self.exchange.create_order(symbol, type, side, amount, price, {
-            'type': 'future',
+        response = self.exchange.sapi_post_futures_transfer({
+            'asset': currency['id'],
+            'amount': self.exchange.currency_to_precision(coin, amount),
+            'type': account,
         })
 
-        print(order)
+    def adjust_margin(self,position_side:str, margin_type:int):
+        # position_side = BOTH for One-way positions, LONG or SHORT for Hedge Mode
+        # margin_type = 1:  add position margin, 2:  reduce position margin
+
+        markets = self.exchange.load_markets()  # https://github.com/ccxt/ccxt/wiki/Manual#loading-markets
+        market = self.exchange.market(symbol)
+        print('Modifying your ISOLATED', symbol, 'position margin:')
+        response = self.exchange.fapiPrivate_post_positionmargin({
+            'symbol': market['id'],
+            'amount': 123.45,  # ←-------------- YOUR AMOUNT HERE
+            'positionSide': position_side,
+            'type': margin_type,
+        })
+
+        print('----------------------------------------------------------------------')
+
+    def create_order(self, symbol, order_type, side, amount, margin_type, price, *args, **kwargs):
+        self.exchange.load_markets()  # preload markets first
+        market = self.exchange.markets[symbol]  # get the market by a unified symbol
+        data = {
+            "symbol": market['id'],  # send the exchange-specific market id
+            "marginType": margin_type,
+            "type": order_type,
+            "side": side,
+            "amount": amount
+        }
+        response = self.exchange.fapiPrivate_post_margintype(data)
+        return response
 
 
 if __name__ == '__main__':
