@@ -4,12 +4,13 @@ from flask import request, render_template
 from py.TV_bot import app
 from ast import literal_eval
 import threading
+from py.TV_bot.core.futures import Futures
 from py.TV_bot.core.account import Account
 from py.TV_bot.models import User
 
 """TRADE PARAMETERS"""
 SYMBOL_LIST = [{"symbol": "BTC/BUSD", "max_trades": 160, 'premium': 1.02, 'minimum_trade_size': 10},
-               {"symbol": "ENJ/BUSD", "max_trades": 50, 'premium': 1.01, 'minimum_trade_size': 10}]
+               {"symbol": "BTC/USD", "max_trades": 160, 'premium': 1.01, 'minimum_trade_size': 1}]
 "Get all accounts for user chris"
 UI_accounts = User.query.filter_by(username='chris').all()
 "create empty dictionary to which to append"
@@ -84,6 +85,13 @@ def webhook():
                                                                       trade_parameters,))
                 t1.start()
                 threads.append(t1)
+            user2 = Futures(name='username', user_id=7, api_k='api_key', api_s='api_secret')
+            t2 = threading.Thread(target=user2.market_maker,
+                                  args=(symbol['symbol'], symbol['max_trades'],
+                                        symbol['premium'], symbol['minimum_trade_size'],
+                                        trade_parameters,))
+            t2.start()
+            threads.append(t2)
         for thread in threads:
             thread.join()
         return f"Trade successfully executed"

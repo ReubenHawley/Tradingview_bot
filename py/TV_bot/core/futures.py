@@ -1,5 +1,9 @@
+from ccxt import ExchangeError
 from account import Account
 import ccxt
+from termcolor import colored
+from py.TV_bot.models import Trade
+from py.TV_bot import db
 from pprint import pprint
 
 
@@ -18,9 +22,9 @@ class Futures(Account):
         self.exchange = ccxt.binance({
             'enableRateLimit': True,  # https://github.com/ccxt/ccxt/wiki/Manual#rate-limit
             'options': {
-                'defaultType': 'future',
+                'defaultType': 'delivery',
                 'dualSidePosition': 'false',
-                'marginType': 'ISOLATED',
+                'adjustForTimeDifference': True,
             },
             'apiKey': api_k,
             # https://github.com/ccxt/ccxt/wiki/Manual#authentication
@@ -31,7 +35,7 @@ class Futures(Account):
     def get_trade_mode(self):
 
         print('Getting your current position mode (One-way or Hedge Mode):')
-        response = self.exchange.fapiPrivate_get_positionside_dual()
+        response = self.exchange.dapiPrivate_get_positionside_dual()
         if response['dualSidePosition']:
             print('You are in Hedge Mode')
         else:
@@ -42,19 +46,24 @@ class Futures(Account):
     def adjust_position_mode(self,mode):
         if mode == 'one':
             print('Setting your position mode to One-way:')
-            response = self.exchange.fapiPrivate_post_positionside_dual({
+            response = self.exchange.dapiPrivate_post_positionside_dual({
                 'dualSidePosition': False,
             })
             print(response)
         elif mode == 'hedge':
             print('Setting your positions to Hedge mode:')
-            response = self.exchange.fapiPrivate_post_positionside_dual({
+            response = self.exchange.dapiPrivate_post_positionside_dual({
                 'dualSidePosition': True,
             })
             print(response)
 
-
     def get_balance(self, symbol):
+        self.exchange.load_markets()
+        market = self.exchange.market(symbol)  # https://github.com/ccxt/ccxt/wiki/Manual#methods-for-markets-and-currencies
+        balances = self.exchange.dapiPrivate_get_balance()  # https://github.com/ccxt/ccxt/wiki/Manual#querying-account-balance
+        return balances
+
+    def get_position(self, symbol):
         self.exchange.load_markets()
         market = self.exchange.market(symbol)  # https://github.com/ccxt/ccxt/wiki/Manual#methods-for-markets-and-currencies
         balance = self.exchange.fetch_balance()  # https://github.com/ccxt/ccxt/wiki/Manual#querying-account-balance
@@ -68,12 +77,13 @@ class Futures(Account):
         pprint(position)
         print('-----------------------------------------')
         print('Your profit and loss for your', symbol, 'position is', position['unrealizedProfit'])
+        return position
 
     def position_risk(self):
         markets = self.exchange.load_markets()  # https://github.com/ccxt/ccxt/wiki/Manual#loading-markets
         symbol = 'BTC/USDT'
         market = self.exchange.market(symbol)
-        positions = self.exchange.fapiPrivate_get_positionrisk()  # https://github.com/ccxt/ccxt/wiki/Manual#implicit-api-methods
+        positions = self.exchange.dapiPrivate_get_positionrisk()  # https://github.com/ccxt/ccxt/wiki/Manual#implicit-api-methods
         positions_by_ids = self.exchange.index_by(positions, 'symbol')  # binance's symbol == ccxt's id
         position = self.exchange.safe_value(positions_by_ids, market['id'])
 
@@ -82,13 +92,13 @@ class Futures(Account):
         print('-----------------------------------------')
         print('Your profit and loss for your', symbol, 'position is ', position['unrealizedProfit'])
 
-    def adjust_leverage(self, symbol, leverage:int):
+    def adjust_leverage(self, symbol, leverage: int):
         markets = self.exchange.load_markets()  # https://github.com/ccxt/ccxt/wiki/Manual#loading-markets
         market = self.exchange.market(symbol)  # https://github.com/ccxt/ccxt/wiki/Manual#methods-for-markets-and-currencies
 
         # https://binance-docs.github.io/apidocs/futures/en/#change-initial-leverage-trade
 
-        self.exchange.fapiPrivate_post_leverage({  # https://github.com/ccxt/ccxt/wiki/Manual#implicit-api-methods
+        self.exchange.dapiPrivate_post_leverage({  # https://github.com/ccxt/ccxt/wiki/Manual#implicit-api-methods
             'symbol': market['id'],  # https://github.com/ccxt/ccxt/wiki/Manual#symbols-and-market-ids
             'leverage': leverage,  # target initial leverage, int from 1 to 125
         })
@@ -98,20 +108,20 @@ class Futures(Account):
         market = self.exchange.market(symbol)
         if mode == 'isolated':
             print('Changing your', symbol, 'position margin mode to ISOLATED:')
-            response = self.exchange.fapiPrivate_post_margintype({
+            response = self.exchange.dapiPrivate_post_margintype({
                 'symbol': market['id'],
                 'marginType': 'ISOLATED',
             })
             print(response)
         elif mode == 'cross':
             print('Changing your', symbol, 'position margin mode to CROSSED:')
-            response = self.exchange.fapiPrivate_post_margintype({
+            response = self.exchange.dapiPrivate_post_margintype({
                 'symbol': market['id'],
                 'marginType': 'CROSSED',
             })
             print(response)
 
-    def transfer_funds(self, amount, coin,account):
+    def transfer_funds(self, amount, coin, account):
         # 1: transfer from spot account to USDT-Ⓜ futures account.
         # 2: transfer from USDT-Ⓜ futures account to spot account.
         # 3: transfer from spot account to COIN-Ⓜ futures account.
@@ -120,7 +130,7 @@ class Futures(Account):
         # amount = 123.45
         currency = self.exchange.currency(coin)
 
-        print('Moving', symbol, 'funds from your spot account to your futures account:')
+        print('Moving', coin, 'funds from your spot account to your futures account:')
 
         response = self.exchange.sapi_post_futures_transfer({
             'asset': currency['id'],
@@ -128,43 +138,102 @@ class Futures(Account):
             'type': account,
         })
 
-    def adjust_margin(self,position_side:str, margin_type:int):
+    def adjust_margin(self,symbol, position_side:str,amount, margin_type:int):
         # position_side = BOTH for One-way positions, LONG or SHORT for Hedge Mode
         # margin_type = 1:  add position margin, 2:  reduce position margin
 
         markets = self.exchange.load_markets()  # https://github.com/ccxt/ccxt/wiki/Manual#loading-markets
         market = self.exchange.market(symbol)
         print('Modifying your ISOLATED', symbol, 'position margin:')
-        response = self.exchange.fapiPrivate_post_positionmargin({
+        response = self.exchange.dapiPrivate_post_positionmargin({
             'symbol': market['id'],
-            'amount': 123.45,  # ←-------------- YOUR AMOUNT HERE
+            'amount': amount,  # ←-------------- YOUR AMOUNT HERE
             'positionSide': position_side,
             'type': margin_type,
         })
 
         print('----------------------------------------------------------------------')
 
-    def create_order(self, symbol, order_type, side, amount, margin_type, price, *args, **kwargs):
-        self.exchange.load_markets()  # preload markets first
-        market = self.exchange.markets[symbol]  # get the market by a unified symbol
-        data = {
-            "symbol": market['id'],  # send the exchange-specific market id
-            "marginType": margin_type,
-            "type": order_type,
-            "side": side,
-            "amount": amount
-        }
-        response = self.exchange.fapiPrivate_post_margintype(data)
-        return response
+    def create_limit_order(self, symbol, price, side, amount, *args, **kwargs):
+        try:
+            self.exchange.load_markets()  # preload markets first
+            market = self.exchange.markets[symbol]  # get the market by a unified symbol
+            response = self.exchange.create_limit_order(symbol=symbol,
+                                                        side=side,
+                                                        amount=amount,
+                                                        price=price,
+                                                        params=kwargs)
+            return response
+        except ExchangeError as e:
+            print(e)
+
+    def create_market_order(self, symbol, side, amount, *args, **kwargs):
+        try:
+            self.exchange.load_markets()  # preload markets first
+            market = self.exchange.markets[symbol]  # get the market by a unified symbol
+            response = self.exchange.create_market_order(symbol=symbol,
+                                                         side=side,
+                                                         amount=amount,
+                                                         price=None,
+                                                         params=kwargs)
+            return response
+        except ExchangeError as e:
+            print(e)
+
+    def market_maker(self, trade_symbol, max_trades, premium, min_trade_size, trade_parameters):
+        base = trade_parameters[0]
+        quote = trade_parameters[1]
+        symbol = "BTC/USD" #f'{quote}/{base}'
+
+        "do a check to see if the trade is possible"
+        try:
+            if trade_parameters is not None:
+                if symbol == trade_symbol:
+                    "returns the response from the exchange, whether successful or not"
+                    entry_order_response = self.create_market_order(symbol=symbol, side="BUY", amount=1)
+                    order_data = self.exchange.fetch_order(id=entry_order_response['info']['orderId'], symbol=symbol)
+                    # entry_trade = Trade(timestamp=entry_order_response['timestamp'],
+                    #                     symbol=entry_order_response['symbol'],
+                    #                     side=entry_order_response['side'],
+                    #                     price=float(order_data['info']['avgPrice']),
+                    #                     amount=entry_order_response['amount'],
+                    #                     cost=entry_order_response['cost'],
+                    #                     fees=entry_order_response['fee']['cost'],
+                    #                     user_id=self.id
+                    #                     )
+                    # db.session.add(entry_trade)
+                    print(colored(f'entry trade submitted to DB for {self.name}: ', 'white'))
+                    print(colored(f'{entry_order_response}', 'green'))
+                    selling_price = float(order_data['info']['avgPrice']) * premium
+                    if entry_order_response:
+                        exit_order_response = \
+                            self.exchange.create_limit_order(symbol=symbol,
+                                                             side="SELL",
+                                                             amount=1,
+                                                             price=selling_price)
+                        self.adjust_margin(symbol=symbol, position_side='BOTH', amount=0.0017, margin_type=1)
+                        print('adjusting margin for account')
+                        # exit_trade = Trade(timestamp=entry_order_response['timestamp'],
+                        #                    symbol=entry_order_response['symbol'],
+                        #                    side=entry_order_response['side'],
+                        #                    price=selling_price,
+                        #                    amount=entry_order_response['amount'],
+                        #                    cost=entry_order_response['cost'],
+                        #                    fees=entry_order_response['fee']['cost'],
+                        #                    user_id=self.id
+                        #                    )
+                        # db.session.add(exit_trade)
+                        # db.session.commit()
+                        print(colored(f'entry trade submitted for {self.name}: {exit_order_response}',
+                                      'green'))
+                        return '200'
+                else:
+                    print(
+                        f'order received for {self.name} on symbol:{symbol} '
+                        f'but strategy is of symbol:{trade_symbol}')
+            else:
+                return "None type received, catching error"
+        except Exception as e:
+            print(f'Failed to create order for {self.name} with', self.exchange.id, type(e).__name__, str(e))
 
 
-if __name__ == '__main__':
-    symbol = "BTC/USDT"
-    binance = Futures('dummy',
-                      1,
-                      'Tvy7itrhTXKdrKPQ0unUTvA4VDlKMDV5WHl8lFmHVZSfxD4OBzPxE0vpmRXZr50V',
-                      'S9dl7cJiPoiIC7OTS59HToO9XebDYDYym4JBkUJrf6DbTDpLcJ9xmzhFMG9zr69k')
-    binance.get_balance(symbol)
-    binance.adjust_position_mode('isolated')
-    # binance.create_order(symbol,'LIMIT','BUY',0.001,59500)
-    binance.get_balance(symbol)
