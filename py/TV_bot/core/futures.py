@@ -1,5 +1,5 @@
 from ccxt import ExchangeError
-from account import Account
+from py.TV_bot.core.account import Account
 import ccxt
 from termcolor import colored
 from py.TV_bot.models import Trade

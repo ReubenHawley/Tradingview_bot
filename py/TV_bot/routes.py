@@ -70,7 +70,6 @@ def webhook():
         # " parse the text into json format"
         webhook_message = literal_eval(webhook_message.decode('utf8'))  # decoding from bytes to json
         trade_parameters = list(webhook_message.values())
-        threads = []
         traders = User.query.filter_by(twopercent=True).all()
         for symbol in SYMBOL_LIST:
             for trader in traders:
@@ -78,22 +77,15 @@ def webhook():
                                user_id=trader.id,
                                api_k=trader.api_key,
                                api_s=trader.api_secret)
-                t1 = threading.Thread(target=user.market_maker, args=(symbol['symbol'],
-                                                                      symbol['max_trades'],
-                                                                      symbol['premium'],
-                                                                      symbol['minimum_trade_size'],
-                                                                      trade_parameters,))
-                t1.start()
-                threads.append(t1)
+                user.market_maker(symbol['symbol'],
+                                  symbol['max_trades'],
+                                  symbol['premium'],
+                                  symbol['minimum_trade_size'],
+                                  trade_parameters)
             user2 = Futures(name='username', user_id=7, api_k='api_key', api_s='api_secret')
-            t2 = threading.Thread(target=user2.market_maker,
-                                  args=(symbol['symbol'], symbol['max_trades'],
-                                        symbol['premium'], symbol['minimum_trade_size'],
-                                        trade_parameters,))
-            t2.start()
-            threads.append(t2)
-        for thread in threads:
-            thread.join()
+            user2.market_maker(symbol['symbol'], symbol['max_trades'],
+                               symbol['premium'], symbol['minimum_trade_size'],
+                               trade_parameters)
         return f"Trade successfully executed"
 
     except Exception as error:
