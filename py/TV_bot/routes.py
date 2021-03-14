@@ -3,9 +3,7 @@ from traceback import print_exc
 from flask import request, render_template
 from py.TV_bot import app
 from ast import literal_eval
-import threading
-from py.TV_bot.core.futures import Futures
-from py.TV_bot.core.account import Account
+from py.TV_bot.core.account import Spot, Futures
 from py.TV_bot.models import User
 
 """TRADE PARAMETERS"""
@@ -17,7 +15,7 @@ UI_accounts = User.query.filter_by(username='chris').all()
 accounts = {}
 "iterate over all sql objects to create dictionary of Account objects"
 for key, value in enumerate(UI_accounts):
-    accounts[key] = Account(value.username, value.id, value.api_key, value.api_secret)
+    accounts[key] = Spot(value.username, value.id, value.api_key, value.api_secret)
 
 
 @app.route('/')
@@ -73,10 +71,10 @@ def webhook():
         traders = User.query.filter_by(twopercent=True).all()
         for symbol in SYMBOL_LIST:
             for trader in traders:
-                user = Account(name=trader.username,
-                               user_id=trader.id,
-                               api_k=trader.api_key,
-                               api_s=trader.api_secret)
+                user = Spot(name=trader.username,
+                            user_id=trader.id,
+                            api_k=trader.api_key,
+                            api_s=trader.api_secret)
                 user.market_maker(symbol['symbol'],
                                   symbol['max_trades'],
                                   symbol['premium'],

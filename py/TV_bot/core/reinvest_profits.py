@@ -1,4 +1,4 @@
-from py.TV_bot.core.account import Account
+from py.TV_bot.core.account import Spot
 import sqlite3
 from py.TV_bot.core import find_user_info as getUsers
 import time
@@ -13,9 +13,9 @@ if __name__ == '__main__':
         users = getUsers()[0]
 
         "instantiate exchange connection"
-        user = Account(name=users['username'],
-                       api_k=users['api_key'],
-                       api_s=users['api_secret'])
+        user = Spot(name=users['username'],
+                    api_k=users['api_key'],
+                    api_s=users['api_secret'])
 
         "fetch trades to parse for profits"
         since = user.exchange.milliseconds() - 86400000  # -1 day from now
