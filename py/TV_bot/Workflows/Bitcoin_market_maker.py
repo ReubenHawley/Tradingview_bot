@@ -1,5 +1,5 @@
 import time
-from py.TV_bot.core.account import Account
+from py.TV_bot.core.account import Spot
 from termcolor import colored
 import threading
 
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     SYMBOL_LIST = [{"symbol": "BNB/USDT", "max_trades": 20, 'trade_size': 2, 'premium': 1.003},
                    ]
     threadlist = []
-    user1 = Account(name='chris', config='../../config.txt')
+    user1 = Spot(name='chris', config='../../config.txt')
     market_maker = MM(user1)
     for trade_symbol in SYMBOL_LIST:
         t1 = threading.Thread(target=market_maker.start_strategy, args=(trade_symbol, sleepytime,))
